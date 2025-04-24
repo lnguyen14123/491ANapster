@@ -3,10 +3,10 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Napster</title>
+    <title>AdminLTE 4 | Lockscreen</title>
     <!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="title" content="AdminLTE 4 | Login Page v2" />
+    <meta name="title" content="AdminLTE 4 | Lockscreen" />
     <meta name="author" content="ColorlibHQ" />
     <meta
       name="description"
@@ -47,73 +47,44 @@
   </head>
   <!--end::Head-->
   <!--begin::Body-->
-  <body class="login-page bg-body-secondary">
-    <div class="login-box">
-      <div class="card card-outline card-primary">
-        <div class="card-header">
-          <a
-            href="../index2.html"
-            class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover"
-          >
-            <h1 class="mb-0"><b>Napster</b></h1>
-          </a>
+  <body class="lockscreen bg-body-secondary">
+    <div class="lockscreen-wrapper">
+      <div class="lockscreen-logo">
+        <a href="../index2.html"><b>Admin</b>LTE</a>
+      </div>
+      <div class="lockscreen-name">John Doe</div>
+      <div class="lockscreen-item">
+        <div class="lockscreen-image">
+          <img src="../../../dist/assets/img/user1-128x128.jpg" alt="User Image" />
         </div>
-        <div class="card-body login-card-body">
-          <p class="login-box-msg">Sign in and start napping!</p>
-
-          <!-- LOGIN FORM STARTS HERE!! -->
-          <form action="/signin" method="post">
-            <div class="input-group mb-1">
-              <div class="form-floating">
-                <input id="loginEmail" name="email" type="email" class="form-control" value="" placeholder="" />
-                <label for="loginEmail">Email</label>
-              </div>
-              <div class="input-group-text"><span class="bi bi-envelope"></span></div>
+        <form class="lockscreen-credentials">
+          <div class="input-group">
+            <input type="password" class="form-control shadow-none" placeholder="password" />
+            <div class="input-group-text border-0 bg-transparent px-1">
+              <button type="button" class="btn shadow-none">
+                <i class="bi bi-box-arrow-right text-body-secondary"></i>
+              </button>
             </div>
-            <div class="input-group mb-1">
-              <div class="form-floating">
-                <input id="loginPassword" name="password" type="password" class="form-control" placeholder="" />
-                <label for="loginPassword">Password</label>
-              </div>
-              <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>
-            </div>
-            <!--begin::Row-->
-            <div class="row">
-              <div class="col-8 d-inline-flex align-items-center">
-                <div class="form-check">
-                  <input class="form-check-input" name="remember" type="checkbox" value="" id="flexCheckDefault" />
-                  <label class="form-check-label" for="flexCheckDefault"> Remember Me </label>
-                </div>
-              </div>
-              <!-- /.col -->
-              <div class="col-4">
-                <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary">Sign In</button>
-                </div>
-              </div>
-              <!-- /.col -->
-            </div>
-            <!--end::Row-->
-          </form>
-          <div class="social-auth-links text-center mb-3 d-grid gap-2">
-            <p>- OR -</p>
-            <a href="#" class="btn btn-primary">
-              <i class="bi bi-facebook me-2"></i> Sign in using Facebook
-            </a>
-            <a href="#" class="btn btn-danger">
-              <i class="bi bi-google me-2"></i> Sign in using Google+
-            </a>
           </div>
-          <!-- /.social-auth-links -->
-          <p class="mb-1"><a href="forgot-password.html">I forgot my password</a></p>
-          <p class="mb-0">
-            <a href="register.html" class="text-center"> Register a new membership </a>
-          </p>
-        </div>
-        <!-- /.login-card-body -->
+        </form>
+      </div>
+      <div class="help-block text-center">Enter your password to retrieve your session</div>
+      <div class="text-center">
+        <a href="login.html" class="text-decoration-none">Or sign in as a different user</a>
+      </div>
+      <div class="lockscreen-footer text-center">
+        Copyright © 2014-2024 &nbsp;
+        <b
+          ><a
+            href="https://adminlte.io"
+            class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover"
+            >AdminLTE.io</a
+          ></b
+        >
+        <br />
+        All rights reserved
       </div>
     </div>
-    <!-- /.login-box -->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
@@ -133,7 +104,7 @@
       crossorigin="anonymous"
     ></script>
     <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
-    <script src="../../../dist/js/adminlte.js"></script>
+    <script src="undefined/js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
       const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
@@ -156,7 +127,6 @@
       });
     </script>
     <!--end::OverlayScrollbars Configure-->
-    <!--end::Script-->
   </body>
   <!--end::Body-->
 </html>
