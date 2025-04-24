@@ -1,9 +1,18 @@
-const express = require("express");
-const cors = require("cors");
-const path = require("path");
-const authRoutes = require("./routes/authRoutes");
+import express from "express";
+import cors from "cors";
+import path from "path";
+import bodyParser from "body-parser";
+import session from "express-session";
 
-const bodyParser = require("body-parser");
+import authRoutes from "./routes/authRoutes.js";
+import appRoutes from "./routes/appRoutes.js";
+
+
+// Required to simulate __dirname in ES Modules
+import { fileURLToPath } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = 3000;
 
@@ -13,9 +22,28 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  session({
+    secret: "supersecretkey", // change this for production!
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
-// Use the auth routes
 app.use("/", authRoutes);
+app.use("/", appRoutes);
+
+
+
+import { Pool } from "pg";
+import dotenv from "dotenv";
+dotenv.config();
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+export default pool;
 
 // Dummy login endpoint
 app.post("/login", (req, res) => {
