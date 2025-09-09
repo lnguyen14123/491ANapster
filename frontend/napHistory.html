@@ -605,15 +605,23 @@
 
     <script>
       fetch("/api/user")
-        .then(res => res.json())
-        .then(data => {
+          .then(res => {
+        if (res.status === 401) {
+          // Not logged in → redirect to signin page
+          window.location.href = "/signin";
+          return null;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.username) {
           document.querySelectorAll(".username-display").forEach(el => {
             el.innerText = data.username;
           });
-        })
-        .catch(err => console.error(err));
+        }
+      })
+      .catch(err => console.error("Fetch error:", err));
     </script>
-
 
   </body>
 </html>
