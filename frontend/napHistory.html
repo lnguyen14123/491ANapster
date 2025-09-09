@@ -73,15 +73,9 @@
                 <i class="bi bi-list"></i>
               </a>
             </li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li>
+            <li class="nav-item d-none d-md-block"><a href="./dashboard.html" class="nav-link">Home</a></li>
           </ul>
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-                <i class="bi bi-search"></i>
-              </a>
-            </li>
             <li class="nav-item dropdown">
               <a class="nav-link" data-bs-toggle="dropdown" href="#">
                 <i class="bi bi-chat-text"></i>
@@ -174,12 +168,13 @@
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <img src="./dist/assets/img/user2-160x160.jpg" class="user-image rounded-circle shadow" alt="User Image" />
-                <span class="d-none d-md-inline">Alexander Pierce</span>
+                <span class="username-display d-none d-md-inline"></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <li class="user-header text-bg-primary">
                   <img src="./dist/assets/img/user2-160x160.jpg" class="rounded-circle shadow" alt="User Image" />
-                  <p>Alexander Pierce - Web Developer <small>Member since Nov. 2023</small></p>
+                  <p class="username-display"> </p>
+                  <small>Member since Nov. 2023</small>
                 </li>
                 <li class="user-body">
                   <div class="row">
@@ -217,12 +212,7 @@
               </li>
 
               <!-- keep the whole menu as-is-->
-              <li class="nav-header">EXAMPLES</li>
               <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                  <p>Auth <i class="nav-arrow bi bi-chevron-right"></i></p>
-                </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -255,23 +245,6 @@
                   <p>Nap History</p>
                 </a>
               </li>
-
-              <!-- Keep the rest from the dashboard menu -->
-              <li class="nav-header">DOCUMENTATIONS</li>
-              <li class="nav-item"><a href="./docs/introduction.html" class="nav-link"><i class="nav-icon bi bi-download"></i><p>Installation</p></a></li>
-              <li class="nav-item"><a href="./docs/layout.html" class="nav-link"><i class="nav-icon bi bi-grip-horizontal"></i><p>Layout</p></a></li>
-              <li class="nav-item"><a href="./docs/color-mode.html" class="nav-link"><i class="nav-icon bi bi-star-half"></i><p>Color Mode</p></a></li>
-              <li class="nav-item">
-                <a href="#" class="nav-link"><i class="nav-icon bi bi-ui-checks-grid"></i><p>Components <i class="nav-arrow bi bi-chevron-right"></i></p></a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item"><a href="./docs/components/main-header.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Main Header</p></a></li>
-                  <li class="nav-item"><a href="./docs/components/main-sidebar.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Main Sidebar</p></a></li>
-                </ul>
-              </li>
-              <li class="nav-item"><a href="./docs/browser-support.html" class="nav-link"><i class="nav-icon bi bi-browser-edge"></i><p>Browser Support</p></a></li>
-              <li class="nav-item"><a href="./docs/how-to-contribute.html" class="nav-link"><i class="nav-icon bi bi-hand-thumbs-up-fill"></i><p>How To Contribute</p></a></li>
-              <li class="nav-item"><a href="./docs/faq.html" class="nav-link"><i class="nav-icon bi bi-question-circle-fill"></i><p>FAQ</p></a></li>
-              <li class="nav-item"><a href="./docs/license.html" class="nav-link"><i class="nav-icon bi bi-patch-check-fill"></i><p>License</p></a></li>
             </ul>
           </nav>
         </div>
@@ -629,5 +602,18 @@
         mo.observe(napBody, { childList: true, subtree: true, characterData: true });
       }
     </script>
+
+    <script>
+      fetch("/api/user")
+        .then(res => res.json())
+        .then(data => {
+          document.querySelectorAll(".username-display").forEach(el => {
+            el.innerText = data.username;
+          });
+        })
+        .catch(err => console.error(err));
+    </script>
+
+
   </body>
 </html>

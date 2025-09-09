@@ -4,7 +4,6 @@ import path from "path";
 const router = express.Router();
 const __dirname = path.resolve();
 
-// Example routes
 router.get("/", (req, res) => {
   res.redirect("/signin");
 });
@@ -16,5 +15,7 @@ router.get("/dashboard", (req, res) => {
 
   res.sendFile(path.join(__dirname, "../frontend/dashboard.html"));
 });
+
+
 
 export default router;

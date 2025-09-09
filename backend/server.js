@@ -6,6 +6,7 @@ import session from "express-session";
 
 import authRoutes from "./routes/authRoutes.js";
 import appRoutes from "./routes/appRoutes.js";
+import apiRoutes from "./routes/api.js";
 
 
 // Required to simulate __dirname in ES Modules
@@ -18,7 +19,6 @@ const PORT = 3000;
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -32,7 +32,7 @@ app.use(
 
 app.use("/", authRoutes);
 app.use("/", appRoutes);
-
+app.use("/api", apiRoutes);
 
 
 import { Pool } from "pg";
