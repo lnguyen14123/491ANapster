@@ -78,63 +78,6 @@
           <ul class="navbar-nav ms-auto">
             <li class="nav-item dropdown">
               <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                <i class="bi bi-chat-text"></i>
-                <span class="navbar-badge badge text-bg-danger">3</span>
-              </a>
-              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <a href="#" class="dropdown-item">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <img src="./dist/assets/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 rounded-circle me-3" />
-                    </div>
-                    <div class="flex-grow-1">
-                      <h3 class="dropdown-item-title">
-                        Brad Diesel
-                        <span class="float-end fs-7 text-danger"><i class="bi bi-star-fill"></i></span>
-                      </h3>
-                      <p class="fs-7">Call me whenever you can...</p>
-                      <p class="fs-7 text-secondary"><i class="bi bi-clock-fill me-1"></i> 4 Hours Ago</p>
-                    </div>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <img src="./dist/assets/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 rounded-circle me-3" />
-                    </div>
-                    <div class="flex-grow-1">
-                      <h3 class="dropdown-item-title">
-                        John Pierce
-                        <span class="float-end fs-7 text-secondary"><i class="bi bi-star-fill"></i></span>
-                      </h3>
-                      <p class="fs-7">I got your message bro</p>
-                      <p class="fs-7 text-secondary"><i class="bi bi-clock-fill me-1"></i> 4 Hours Ago</p>
-                    </div>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <div class="d-flex">
-                    <div class="flex-shrink-0">
-                      <img src="./dist/assets/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 rounded-circle me-3" />
-                    </div>
-                    <div class="flex-grow-1">
-                      <h3 class="dropdown-item-title">
-                        Nora Silvester
-                        <span class="float-end fs-7 text-warning"><i class="bi bi-star-fill"></i></span>
-                      </h3>
-                      <p class="fs-7">The subject goes here</p>
-                      <p class="fs-7 text-secondary"><i class="bi bi-clock-fill me-1"></i> 4 Hours Ago</p>
-                    </div>
-                  </div>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
-              </div>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link" data-bs-toggle="dropdown" href="#">
                 <i class="bi bi-bell-fill"></i>
                 <span class="navbar-badge badge text-bg-warning">15</span>
               </a>
@@ -176,16 +119,9 @@
                   <p class="username-display"> </p>
                   <small>Member since Nov. 2023</small>
                 </li>
-                <li class="user-body">
-                  <div class="row">
-                    <div class="col-4 text-center"><a href="#">Followers</a></div>
-                    <div class="col-4 text-center"><a href="#">Sales</a></div>
-                    <div class="col-4 text-center"><a href="#">Friends</a></div>
-                  </div>
-                </li>
                 <li class="user-footer">
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  <a id="logout-btn" href="#" class="btn btn-default btn-flat float-end">Sign out</a>
                 </li>
               </ul>
             </li>
@@ -194,61 +130,128 @@
       </nav>
 
       <!-- SIDEBAR: copied exactly from your dashboard -->
-      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+      <aside       <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+        <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
+          <!--begin::Brand Link-->
           <a href="./dashboard.html" class="brand-link">
-            <img src="./dist/assets/img/napsterlogo_image.png" alt="AdminLTE Logo" class="brand-image opacity-75 shadow" />
+            <!--begin::Brand Image-->
+            <img
+              src="/dist/assets/img/napsterlogo_image.png"
+              alt="AdminLTE Logo"
+              class="brand-image opacity-75 shadow"
+            />
+            <!--end::Brand Image-->
+            <!--begin::Brand Text-->
             <span class="brand-text fw-light">Napster</span>
+            <!--end::Brand Text-->
           </a>
+          <!--end::Brand Link-->
         </div>
+        <!--end::Sidebar Brand-->
+        <!--begin::Sidebar Wrapper-->
         <div class="sidebar-wrapper">
           <nav class="mt-2">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-              <li class="nav-item">
-                <a href="./dashboard.html" class="nav-link">
+            <!--begin::Sidebar Menu-->
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <li class="nav-item menu-open">
+                <a href="./dashboard.html" class="nav-link active">
                   <i class="nav-icon bi bi-speedometer"></i>
-                  <p>Dashboard</p>
+                  <p>
+                    Dashboard
+                  </p>
                 </a>
               </li>
-
-              <!-- keep the whole menu as-is-->
               <li class="nav-item">
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>Version 1 <i class="nav-arrow bi bi-chevron-right"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item"><a href="./examples/login.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Login</p></a></li>
-                      <li class="nav-item"><a href="./examples/register.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Register</p></a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>Version 2 <i class="nav-arrow bi bi-chevron-right"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item"><a href="./examples/login-v2.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Login</p></a></li>
-                      <li class="nav-item"><a href="./examples/register-v2.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Register</p></a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item"><a href="./examples/lockscreen.html" class="nav-link"><i class="nav-icon bi bi-circle"></i><p>Lockscreen</p></a></li>
-                </ul>
-              </li>
-
-              <!-- Add a direct link to THIS page in the sidebar -->
-              <li class="nav-item">
-                <a href="./naps-history.html" class="nav-link active">
+                <a href="./napHistory.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Nap History</p>
                 </a>
               </li>
+
+              <li class="nav-item">
+                <a href="./nappingPage.html" class="nav-link">
+                  <i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Napping Page</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="./settings.html" class="nav-link">
+                  <i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Settings</p>
+                </a>
+              </li>
+
+
+
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
+                      <p>
+                        Version 1
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                      </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                      <li class="nav-item">
+                        <a href="./examples/login.html" class="nav-link">
+                          <i class="nav-icon bi bi-circle"></i>
+                          <p>Login</p>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="./examples/register.html" class="nav-link">
+                          <i class="nav-icon bi bi-circle"></i>
+                          <p>Register</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#" class="nav-link">
+                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
+                      <p>
+                        Version 2
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                      </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                      <li class="nav-item">
+                        <a href="./examples/login-v2.html" class="nav-link">
+                          <i class="nav-icon bi bi-circle"></i>
+                          <p>Login</p>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="./examples/register-v2.html" class="nav-link">
+                          <i class="nav-icon bi bi-circle"></i>
+                          <p>Register</p>
+                        </a>
+                      </li>
+                    </ul>
+                  </li>
+                  <li class="nav-item">
+                    <a href="./examples/lockscreen.html" class="nav-link">
+                      <i class="nav-icon bi bi-circle"></i>
+                      <p>Lockscreen</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
             </ul>
+            <!--end::Sidebar Menu-->
           </nav>
         </div>
+        <!--end::Sidebar Wrapper-->
       </aside>
+
 
       <!-- MAIN CONTENT -->
       <main class="app-main">
@@ -393,7 +396,7 @@
 
       <!-- FOOTER: same as dashboard -->
       <footer class="app-footer">
-        <div class="float-end d-none d-sm-inline">Anything you want</div>
+        <div class="float-end d-none d-sm-inline">Dream more. Do More.</div>
         <strong>
           Copyright &copy; 2014-2024
           <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
@@ -622,6 +625,40 @@
       })
       .catch(err => console.error("Fetch error:", err));
     </script>
+
+    <script>
+      fetch("/api/user")
+          .then(res => {
+        if (res.status === 401) {
+          // Not logged in → redirect to signin page
+          window.location.href = "/signin";
+          return null;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.username) {
+          document.querySelectorAll(".username-display").forEach(el => {
+            el.innerText = data.username;
+          });
+        }
+      })
+      .catch(err => console.error("Fetch error:", err));
+
+      document.getElementById("logout-btn").addEventListener("click", () => {
+        fetch("/logout", {
+          method: "POST"
+        })
+          .then(() => {
+            // After logout, go to signin page
+            window.location.href = "/signin";
+          })
+          .catch(err => console.error("Logout error:", err));
+      });
+
+    </script>
+
+
 
   </body>
 </html>

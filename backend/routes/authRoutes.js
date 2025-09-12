@@ -82,5 +82,20 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.post("/logout", (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      return res.status(500).json({ error: "Failed to log out" });
+    }
+
+    // Clear cookie as well (optional but good practice)
+    res.clearCookie("connect.sid");
+
+    // Redirect to signin page
+    res.redirect("/signin");
+  });
+});
+
   
 export default router;
