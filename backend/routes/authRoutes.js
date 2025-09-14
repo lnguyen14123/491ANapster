@@ -54,7 +54,7 @@ router.post("/signin", async (req, res) => {
       name: user.name
     };
 
-    res.redirect("/dashboard");
+    res.redirect("/nappingPage");
   } catch (err) {
     console.error(err);
     res.send("Something went wrong during sign-in.");

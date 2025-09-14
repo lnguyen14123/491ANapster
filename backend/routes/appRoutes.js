@@ -16,6 +16,14 @@ router.get("/dashboard", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/dashboard.html"));
 });
 
+router.get("/nappingPage", (req, res) => {
+  if (!req.session.user) {
+    return res.redirect("/signin");
+  }
+
+  res.sendFile(path.join(__dirname, "../frontend/nappingPage.html"));
+});
+
 
 
 export default router;
