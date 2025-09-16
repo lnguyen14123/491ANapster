@@ -15,6 +15,40 @@ router.get("/user", (req, res) => {
     
       res.json({ username: req.session.user.name });        
   });
-  
+
+router.post("/changeusername", async (req, res) => {
+  const username = req.body.username.trim();
+
+  const userID = req.session.user?.id;
+  if (!userID) {
+    return res.status(401).send("Not logged in");
+  }
+
+  try {
+    // do some checks before inserting
+    if (!username || username.length < 3) {
+      return res.status(400).send("Username must be at least 3 characters");
+    }
+
+    if (username == req.session.user.name) {
+      return res.status(400).send("Username must be different from current username");
+    }
+
+    // Update the username for this user
+    await pool.query(
+      `UPDATE "User" SET name = $1 WHERE userID = $2`,
+      [username, userID]
+    );
+
+    req.session.user.name = username;
+
+    res.send("Username updated successfully");
+
+  } catch (err) {
+    // can we just do an alert here
+    console.error(err);
+    res.send("Something went wrong during sign-in.");
+  }
+});
 
 export default router;

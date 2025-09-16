@@ -296,16 +296,23 @@
                   <div class="card-header">
                     <h3 class="card-title"><i class="bi bi-person-lines-fill me-1"></i> Username</h3>
                   </div>
+
                   <div class="card-body">
                     <p class="text-muted small mb-2">Change the name displayed across the app.</p>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="bi bi-at"></i></span>
-                      <input type="text" class="form-control" id="usernameInput" value="jane_doe" placeholder="Enter new username">
-                    </div>
-                    <div class="text-end mt-2">
-                      <button class="btn btn-primary btn-sm"><i class="bi bi-check2-circle me-1"></i>Save Username</button>
-                    </div>
+                  
+                    <form id="changeUsernameForm">
+                      <div class="input-group mb-2">
+                        <span class="input-group-text"><i class="bi bi-at"></i></span>
+                        <input type="text" class="form-control" name="username" id="usernameInput" placeholder="" required>
+                      </div>
+                      <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                          <i class="bi bi-check2-circle me-1"></i>Save Username
+                        </button>
+                      </div>
+                    </form>
                   </div>
+                  
                 </div>
 
                 <!-- Privacy -->
@@ -522,7 +529,14 @@
           document.querySelectorAll(".username-display").forEach(el => {
             el.innerText = data.username;
           });
+
+          var usernameInput = document.getElementById("usernameInput");
+          if (usernameInput) {
+            usernameInput.value = data.username;
+          }
         }
+
+
       })
       .catch(err => console.error("Fetch error:", err));
 
@@ -535,6 +549,36 @@
             window.location.href = "/signin";
           })
           .catch(err => console.error("Logout error:", err));
+      });
+
+
+      document.getElementById("changeUsernameForm").addEventListener("submit", async (e) => {
+        e.preventDefault(); // prevent default form submission
+        const username = document.getElementById("usernameInput").value.trim();
+
+        try {
+          const res = await fetch("/api/changeusername", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username })
+          });
+
+          const message = await res.text(); // server sends a text response
+
+          if (res.ok) {
+            alert("✅ " + message);
+
+            document.querySelectorAll(".username-display").forEach(el => {
+              el.innerText = username;
+            });
+
+          } else {
+            alert("❌ " + message);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("❌ Something went wrong. Please try again.");
+        }
       });
 
     </script>
