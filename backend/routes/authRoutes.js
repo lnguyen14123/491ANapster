@@ -16,14 +16,17 @@ router.get("/signin", (req, res) => {
   res.sendFile(path.join(__dirname, "../../frontend/login.html"));
 });
 
+// set default page as /signin
 router.get("/", (req, res) => {
   res.redirect("/signin");
 });
 
+// serve the register page
 router.get("/register", (req, res) => {
   res.sendFile(path.join(__dirname, "../../frontend/register.html"));
 });
 
+// handle post to sign in path, handle authentication and login
 router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
@@ -61,6 +64,7 @@ router.post("/signin", async (req, res) => {
   }
 });
 
+// handle post to register path, handle authentication and login
 router.post("/register", async (req, res) => {
   console.log(req.body);
 
@@ -82,6 +86,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// handle post to logout path, log out the user and end their session
 router.post("/logout", (req, res) => {
   req.session.destroy(err => {
     if (err) {

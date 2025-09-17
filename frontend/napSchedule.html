@@ -179,8 +179,8 @@
               data-accordion="false"
             >
 
-              <li class="nav-item menu-open">
-                <a href="./nappingPage.html" class="nav-link active">
+              <li class="nav-item">
+                <a href="./nappingPage.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Home</p>
                 </a>
@@ -201,8 +201,8 @@
                 </a>
               </li>
 
-              <li class="nav-item">
-                <a href="./napSchedule.html" class="nav-link">
+              <li class="nav-item menu-open">
+                <a href="./napSchedule.html" class="nav-link active">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Nap Schedule</p>
                 </a>
@@ -285,53 +285,98 @@
         <div class="app-content-header">
           <!--begin::Container-->
           <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0"></h3></div>
-              <div class="col-sm-6">
-            <!--Alarm with button-->
-            <!--Styling for the page-->
-            <style>
-           /* Shifting button to center */
-            .custom-alarm-wrapper {
-              height: 50vh;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-            }
-
-            .custom-alarm-inner {
-            text-align: center;
-            transform: translateX(-300px); 
-            }
-
-            /* Coloring the button */
-            .btn-purple {
-            background-color: #d6b3ff;
-            color: #fff;
-            border: none;
-          }
-
-          .btn-purple:hover {
-          background-color: #c59aff; 
-          }   
-          </style>
-
-          <!--Alarm Button and Timer-->
-          <div class="app-content custom-alarm-wrapper">
-          <div class="custom-alarm-inner">
-          <button id="alarmButton" class="btn btn-purple btn-lg px-5 py-3 fs-4 mb-3">
-            <i class="bi bi-alarm-fill"></i>  Alarm
-          </button>
-          <br />
-          <span id="alarmTimer" class="fs-2 fw-bold">00:00</span>
+                    <!--begin::Weekly Calendar Block-->
+        <div class="container py-4">
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">Weekly Calendar</h5>
+            </div>
+          <div class="card-body p-0">
+  
+          <!--Days-->
+          <div class="row g-0 text-center fw-bold border-bottom bg-light">
+            <div class="col-1 border-end"></div>
+            <div class="col border-end">Monday</div>
+            <div class="col border-end">Tuesday</div>
+            <div class="col border-end">Wednesday</div>
+            <div class="col border-end">Thursday</div>
+            <div class="col border-end">Friday</div>
+            <div class="col border-end">Saturday</div>
+            <div class="col">Sunday</div>
           </div>
+  
+          <!-- Time Slots -->
+          <div class="calendar-time-slots">
+  
+          <!-- 1:00 PM -->
+          <div class="row g-0 border-bottom" style="min-height: 80px;">
+            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">1:00 PM</div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col"></div>
           </div>
-            <!--end::Row-->
+  
+          <!-- 2:00 PM -->
+          <div class="row g-0 border-bottom" style="min-height: 80px;">
+            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">2:00 PM</div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col"></div>
+          </div>
+  
+          <!-- 3:00 PM -->
+          <div class="row g-0 border-bottom" style="min-height: 80px;">
+            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">3:00 PM</div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col"></div>
+          </div>
+  
+          <!-- 4:00 PM -->
+          <div class="row g-0 border-bottom" style="min-height: 80px;">
+            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">4:00 PM</div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col"></div>
+          </div>
+  
+          <!-- 5:00 PM -->
+          <div class="row g-0 border-bottom" style="min-height: 80px;">
+            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">5:00 PM</div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col border-end"></div>
+            <div class="col"></div>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+          </div>
+          <!--end::Weekly Calendar Block-->
+  
           </div>
           <!--end::Container-->
         </div>
-        <div class="app-content">
 
       <!--begin::Footer-->
       <footer style="

@@ -16,6 +16,8 @@ router.get("/user", (req, res) => {
       res.json({ username: req.session.user.name });        
   });
 
+
+// handle the change username action, updates database to new username
 router.post("/changeusername", async (req, res) => {
   const username = req.body.username.trim();
 
