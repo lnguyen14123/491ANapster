@@ -3,6 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
 import { pool } from "../db.js";
+import { randomUUID } from "crypto"; // built-in in Node.js v14+
+
 
 // __dirname workaround for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -72,12 +74,20 @@ router.post("/register", async (req, res) => {
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
+    const userID = randomUUID();
 
     await pool.query(
       `INSERT INTO "User" (userID, name, email, password_hash)
-       VALUES (gen_random_uuid(), $1, $2, $3)`,
-      [username, email, hashedPassword]
+        VALUES ($1, $2, $3, $4)`,
+        [userID, username, email, hashedPassword]
     );
+
+    await pool.query(
+      `INSERT INTO "nappingprofile" (userid, currentstreak, longeststreak, nappingpoints, averagenapquality, preferrednaplen)
+       VALUES ($1, 0, 0, 0, 0, 1800)`,
+       [userID]
+    );
+
 
     res.redirect("/signin");
   } catch (err) {

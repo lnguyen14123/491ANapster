@@ -195,6 +195,7 @@
                   </p>
                 </a>
               </li>
+
               <li class="nav-item">
                 <a href="./napHistory.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
@@ -209,8 +210,10 @@
                 </a>
               </li>
 
+              <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
 
-              <li class="nav-item menu-open">
+
+              <li class="nav-item">
                 <a href="./settings.html" class="nav-link active">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Settings</p>
@@ -319,6 +322,7 @@
                         </button>
                       </div>
                     </form>
+
                   </div>
                   
                 </div>
@@ -378,36 +382,42 @@
                 <!-- Preferred Nap Length -->
                 <div class="card">
                   <div class="card-header">
-                    <h3 class="card-title"><i class="bi bi-stopwatch-fill me-1"></i> Preferred Nap Length</h3>
+                    <h3 class="card-title">
+                      <i class="bi bi-stopwatch-fill me-1"></i> Preferred Nap Length
+                    </h3>
                   </div>
+                
                   <div class="card-body">
-                    <p class="text-muted small mb-2">Choose your default nap duration.</p>
-                    <div class="mb-3">
-                      <label class="form-label small text-muted" for="napLength">Nap time</label>
-                      <select id="napLength" class="form-select form-select-sm">
-                        <!-- Options from 10 min to 60 min in 5 min increments -->
-                        <option value="10">10 minutes</option>
-                        <option value="15">15 minutes</option>
-                        <option value="20">20 minutes</option>
-                        <option value="25">25 minutes</option>
-                        <option value="30" selected>30 minutes</option>
-                        <option value="35">35 minutes</option>
-                        <option value="40">40 minutes</option>
-                        <option value="45">45 minutes</option>
-                        <option value="50">50 minutes</option>
-                        <option value="55">55 minutes</option>
-                        <option value="60">60 minutes</option>
-                      </select>
-                    </div>
-                    <div class="text-end">
-                      <button class="btn btn-primary btn-sm">
-                        <i class="bi bi-check2-circle me-1"></i> Save Nap Length
-                      </button>
-                    </div>
+                    <form id="changeNapLen">
+                      <p class="text-muted small mb-2">Choose your default nap duration.</p>
+                
+                      <div class="mb-3">
+                        <label class="form-label small text-muted" for="napLength">Nap time</label>
+                        <select id="napLength" name="napLength" class="form-select form-select-sm">
+                          <!-- Options from 10 min to 60 min in 5 min increments -->
+                          <option value="10">10 minutes</option>
+                          <option value="15">15 minutes</option>
+                          <option value="20">20 minutes</option>
+                          <option value="25">25 minutes</option>
+                          <option value="30" selected>30 minutes</option>
+                          <option value="35">35 minutes</option>
+                          <option value="40">40 minutes</option>
+                          <option value="45">45 minutes</option>
+                          <option value="50">50 minutes</option>
+                          <option value="55">55 minutes</option>
+                          <option value="60">60 minutes</option>
+                        </select>
+                      </div>
+                
+                      <div class="text-end">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                          <i class="bi bi-check2-circle me-1"></i> Save Nap Length
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
-
-              </div>
+                              </div>
 
               <!-- RIGHT COLUMN -->
               <div class="col-12 col-lg-6">
@@ -548,6 +558,17 @@
       })
       .catch(err => console.error("Fetch error:", err));
 
+
+      fetch("/api/naplen")
+    .then(res => res.json())
+    .then(data => {
+      const naplen = data.preferrednaplen / 60; // if DB is in seconds
+
+      console.log(naplen);
+
+      document.getElementById("napLength").value = naplen.toString();
+    });
+
       document.getElementById("logout-btn").addEventListener("click", () => {
         fetch("/logout", {
           method: "POST"
@@ -588,6 +609,35 @@
           alert("❌ Something went wrong. Please try again.");
         }
       });
+
+      document.getElementById("changeNapLen").addEventListener("submit", async (e) => {
+        e.preventDefault(); // prevent default form submission
+        const napSelect = document.getElementById("napLength");
+        const napValue = napSelect.value; // string, e.g. "30"
+
+        console.log(napValue);
+
+        try {
+          const res = await fetch("/api/changeNapLen", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ napValue })
+          });
+
+          const message = await res.text(); // server sends a text response
+
+          if (res.ok) {
+            alert("✅ " + message);
+
+          } else {
+            alert("❌ " + message);
+          }
+        } catch (err) {
+          console.error(err);
+          alert("❌ Something went wrong. Please try again.");
+        }
+      });
+
 
     </script>
 

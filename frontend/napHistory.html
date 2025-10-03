@@ -175,7 +175,7 @@
                   </p>
                 </a>
               </li>
-              <li class="nav-item menu-open">
+              <li class="nav-item">
                 <a href="./napHistory.html" class="nav-link active">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Nap History</p>
@@ -188,6 +188,8 @@
                   <p>Nap Schedule</p>
                 </a>
               </li>
+
+              <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
 
               <li class="nav-item">
                 <a href="./settings.html" class="nav-link">
@@ -661,6 +663,29 @@
     </script>
 
 
+    <script>
+
+      let naps = []; // global
+
+
+      fetch("/api/naphistory")
+            .then(res => {
+          if (res.status === 401) {
+            // Not logged in → redirect to signin page
+            window.location.href = "/signin";
+            return null;
+          }
+          return res.json();
+        })
+        .then(data => {          
+          if (data && data.naps) {
+            naps = data.naps; // store globally
+            console.log("Fetched naps:", naps);
+          }
+        })
+        .catch(err => console.error("Fetch error:", err));
+
+    </script>
 
   </body>
 </html>

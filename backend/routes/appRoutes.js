@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 
-
 // instantiate global objects
 
 const router = express.Router();
