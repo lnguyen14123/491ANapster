@@ -135,7 +135,7 @@ router.post("/startNap", async (req, res) => {
     const napID = randomUUID();
     await pool.query(
       `INSERT INTO "nap" (napid, userid, napstart)
-      VALUES ($1, $2, NOW())`,
+      VALUES ($1, $2, NOW() AT TIME ZONE 'UTC')`,
       [napID, userID]
     );
 
@@ -165,7 +165,7 @@ router.post("/endNap", async (req, res) => {
   try {
     await pool.query(
       `UPDATE "nap" 
-        SET napend = NOW()
+        SET napend = NOW() AT TIME ZONE 'UTC'
       WHERE napid = $1 AND userid = $2`,
       [napID, userID]
     );
@@ -176,6 +176,80 @@ router.post("/endNap", async (req, res) => {
     // can we just do an alert here
     console.error(err);
     res.send("Something went wrong!");
+  }
+});
+
+router.post("/save-naps", async (req, res) => {
+  const userID = req.session.user?.id;
+  if (!userID) {
+    return res.status(401).send("Not logged in");
+  }
+
+
+  const naps = req.body.naps; // Expecting [{ day: "Monday", time: "8:00 AM" }, ...]
+  if (!Array.isArray(naps) || naps.length === 0) {
+    return res.status(400).send("No nap times provided");
+  }
+
+  try {
+    const dayMap = {
+      Monday: 0,
+      Tuesday: 1,
+      Wednesday: 2,
+      Thursday: 3,
+      Friday: 4,
+      Saturday: 5,
+      Sunday: 6
+    };
+
+    const parseHour = (timeStr) => {
+      const [time, modifier] = timeStr.split(" ");
+      let [hour, minutes] = time.split(":").map(Number);
+      if (modifier === "PM" && hour !== 12) hour += 12;
+      if (modifier === "AM" && hour === 12) hour = 0;
+      return hour; // integer hour (0–23)
+    };
+    
+    await pool.query(`DELETE FROM "userAvailability" WHERE userid = $1`, [userID]);
+
+    // Build the array of values
+    const values = naps.map(({ day, time }) => [
+      userID,
+      dayMap[day],
+      parseHour(time)
+    ]);
+
+    // Insert all at once
+    const insertQuery = `
+      INSERT INTO "userAvailability" (userid, day, time)
+      VALUES ${values.map((_, i) => `($${i * 3 + 1}, $${i * 3 + 2}, $${i * 3 + 3})`).join(", ")}
+    `;
+
+    const flatValues = values.flat();
+
+    await pool.query(insertQuery, flatValues);
+
+    res.json({ message: "Saved successfully!" });
+  } catch (err) {
+    console.error("Error saving naps:", err);
+    res.status(500).send("Something went wrong saving naps");
+  }
+});
+
+router.get("/get-naps", async (req, res) => {
+  const userID = req.session.user?.id;
+  if (!userID) return res.status(401).send("Not logged in");
+
+  try {
+    const result = await pool.query(
+      `SELECT day, time FROM "userAvailability" WHERE userid = $1`,
+      [userID]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Error fetching naps:", err);
+    res.status(500).send("Something went wrong loading naps");
   }
 });
 
