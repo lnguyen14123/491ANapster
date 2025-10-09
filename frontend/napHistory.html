@@ -189,6 +189,9 @@
                 </a>
               </li>
 
+              <li class="nav-item"><a href="./userSchedule.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>User Schedule</p></a></li>
+
+
               <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
 
               <li class="nav-item">
@@ -299,7 +302,7 @@
                       </tr>
                     </thead>
                     <tbody id="napBody">
-                      <tr>
+                      <!-- <tr>
                         <td><time datetime="2025-04-23">April 23, 2025</time></td>
                         <td><time datetime="2025-04-23T14:00">2:00 PM</time></td>
                         <td><time datetime="2025-04-23T14:45">2:45 PM</time></td>
@@ -319,7 +322,7 @@
                         <td><time datetime="2025-04-21T15:30">3:30 PM</time></td>
                         <td data-duration></td>
                         <td>Quick power nap</td>
-                      </tr>
+                      </tr> -->
                     </tbody>
                   </table>
                 </div>
@@ -603,11 +606,6 @@
       renderAnalytics();
 
       // Optional: auto-refresh analytics when table changes (e.g., dynamic edits)
-      const napBody = document.getElementById('napBody');
-      if (window.MutationObserver && napBody) {
-        const mo = new MutationObserver(() => { recalc(); renderAnalytics(); });
-        mo.observe(napBody, { childList: true, subtree: true, characterData: true });
-      }
     </script>
 
     <script>
@@ -664,26 +662,70 @@
 
 
     <script>
+      function calculateDuration(start, end) {
+        if (!end) return "—";
+        const diffMs = new Date(end) - new Date(start);
+        const minutes = Math.round(diffMs / 60000);
+        const seconds = Math.round((diffMs % 60000) / 1000);
+        return `${minutes > 0 ? minutes + " min " : ""}${seconds} sec`;
+      }
+
+      const formatterDate = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+
+      const formatterTime = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/Los_Angeles",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      });
+
 
       let naps = []; // global
 
+      async function loadNapData() {
+        try {
+          const res = await fetch("/api/naphistory"); // or whatever your endpoint is
+          if (!res.ok) throw new Error("Failed to load naps");
+          naps = (await res.json()).naps;
 
-      fetch("/api/naphistory")
-            .then(res => {
-          if (res.status === 401) {
-            // Not logged in → redirect to signin page
-            window.location.href = "/signin";
-            return null;
-          }
-          return res.json();
-        })
-        .then(data => {          
-          if (data && data.naps) {
-            naps = data.naps; // store globally
-            console.log("Fetched naps:", naps);
-          }
-        })
-        .catch(err => console.error("Fetch error:", err));
+          // Clear the current table body
+          const napBody = document.getElementById("napBody");
+          napBody.innerHTML = "";
+
+          // Populate rows dynamically
+
+          naps.slice(0, 10).forEach(nap => {
+            const start = new Date(nap.napstart);
+            const end = nap.napend ? new Date(nap.napend) : null;
+
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td><time datetime="${nap.napstart}">${formatterDate.format(start)}</time></td>
+              <td><time datetime="${nap.napstart}">${formatterTime.format(start)}</time></td>
+              <td><time datetime="${nap.napend || ''}">${end ? formatterTime.format(end) : "—"}</time></td>
+              <td data-duration>${calculateDuration(start, end)}</td>
+              <td>${end ? "Completed" : "Ongoing..."}</td>
+            `;
+            napBody.appendChild(tr);
+          });
+
+          // Recalculate durations and re-render analytics
+          recalc();
+          renderAnalytics();
+
+        } catch (err) {
+          console.error("Error loading nap data:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadNapData();
+      });
 
     </script>
 

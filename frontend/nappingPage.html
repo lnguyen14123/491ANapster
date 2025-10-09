@@ -8,7 +8,7 @@
   <!-- Fonts / Icons / AdminLTE -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/styles/overlayscrollbars.min.css" />
   <link rel="stylesheet" href="./dist/css/adminlte.css" />
   <link rel="icon" type="image/png" href="./dist/assets/img/napsterlogo.png" />
   
@@ -63,8 +63,6 @@
     }
     @media (max-width: 900px){ .glass{ grid-template-columns: 1fr; } }
 
-
-    /* Kate Dinh help to design this part */
     /* Circular timer (violet) */
     .nap-circle{
       aspect-ratio:1/1; width: 420px; max-width: 100%;
@@ -107,8 +105,6 @@
     }
     .btn-ghost:hover{ background:#f5f3ff; }
 
-    /* Kate Dinh's part end here */
-
     /* Right panel */
     .panel{
       background: #ffffffc4;
@@ -136,6 +132,21 @@
       margin-top: .8rem; font-style: italic; color:#475569; font-size:.95rem;
       display:flex; gap:.5rem; align-items:flex-start;
     }
+
+    /* --- Sleep Music mini player --- */
+    .nap-mini {
+      display:flex; gap:12px; align-items:center;
+      border:1px solid rgba(2,6,23,.06); background:#ffffffc4;
+      border-radius:12px; padding:12px;
+    }
+    .nap-mini img { width:56px; height:56px; object-fit:cover; border-radius:8px; background:#f3f3f3; }
+    .nap-mini .meta { display:flex; flex-direction:column; min-width:0; }
+    .nap-mini .title { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .nap-mini .sub { color:#666; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .nap-mini .actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+    .nap-mini .btn { padding:.45rem .8rem; border-radius:999px; border:1px solid #ddd; background:#fafafa; cursor:pointer; }
+    .nap-mini .primary { background: var(--violet); color:#fff; border-color:transparent; text-decoration:none; }
+    .nap-mini .status { color:#555; margin-top:4px; min-height:1.2em; }
   </style>
 </head>
 
@@ -191,13 +202,13 @@
     <div class="sidebar-wrapper">
       <nav class="mt-2">
         <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-          <li class="nav-item">
+          <li class="nav-item menu-open">
             <a href="./nappingPage.html" class="nav-link active"><i class="nav-icon bi bi-moon-stars"></i><p>Home</p></a>
           </li>
           <li class="nav-item"><a href="./dashboard.html" class="nav-link"><i class="nav-icon bi bi-speedometer"></i><p>Dashboard</p></a></li>
           <li class="nav-item"><a href="./napHistory.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Nap History</p></a></li>
           <li class="nav-item"><a href="./napSchedule.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Nap Schedule</p></a></li>
-          <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
+          <li class="nav-item"><a href="./location.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Location Recommendation</p></a></li> 
           <li class="nav-item"><a href="./settings.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Settings</p></a></li>
         </ul>
       </nav>
@@ -218,7 +229,7 @@
         <section aria-label="Nap timer">
           <div class="nap-circle" id="napCircle">
             <div class="nap-core">
-              <div id="countdown" class="countdown" aria-live="polite"></div>
+              <div id="countdown" class="countdown" aria-live="polite">20:00</div>
               <div id="status" class="status">Ready to nap</div>
               <div class="controls">
                 <button id="startPauseBtn" class="btn-violet"><i class="bi bi-play-fill me-1"></i><span>Start</span></button>
@@ -232,15 +243,14 @@
         <aside class="panel" aria-label="Nap options">
           <h5><i class="bi bi-stars me-2"></i>Quick presets</h5>
           <div class="presets" id="presets">
-            <button class="chip" data-min="15">15 min</button>
+            <button class="chip active" data-min="15">15 min</button>
             <button class="chip" data-min="20">20 min</button>
             <button class="chip" data-min="30">30 min</button>
-            <button class="chip" data-min="60">60 min</button>
           </div>
 
           <div class="inline">
             <label for="durationMin" class="form-label m-0">Custom</label>
-            <input id="durationMin" type="number" class="form-control form-control-sm" min="1" max="180" value="" />
+            <input id="durationMin" type="number" class="form-control form-control-sm" min="1" max="180" value="20" />
             <span>min</span>
           </div>
 
@@ -249,6 +259,24 @@
             <div id="quoteText">“A short nap can refuel your day.”</div>
           </div>
         </aside>
+        <!-- Kate Dinh adds for sleepMusic -->
+        <!-- Sleep Music mini player (spans both columns) -->
+        <section class="nap-mini" style="grid-column:1 / -1;" aria-label="Sleep music mini player">
+          <img id="napMiniImg" alt="cover" />
+          <div class="meta">
+            <div class="title" id="napMiniTitle">No track selected</div>
+            <div class="sub" id="napMiniSub">Rain — 30s preview • Loop: On</div>
+            <div class="status" id="napMiniStatus"></div>
+          </div>
+          <div class="actions">
+            <button class="btn" id="napMiniPlay"><i class="bi bi-play-fill me-1"></i>Play</button>
+            <button class="btn" id="napMiniPause"><i class="bi bi-pause-fill me-1"></i>Pause</button>
+            <a class="btn primary" href="./sleepMusic.html?return=/nappingPage.html">
+              <i class="bi bi-music-note-list me-1"></i>Change music
+            </a>
+          </div>
+          <audio id="napMiniAudio" preload="auto"></audio>
+        </section>
       </div>
     </div>
 
@@ -287,11 +315,6 @@
 </script>
 
 <!-- Nap logic  -->
-
-
-<script>
-  </script>
-
 <script>
 (function(){
   const circle = document.getElementById('napCircle');
@@ -304,28 +327,17 @@
 
   const STATE = { IDLE:'idle', RUNNING:'running', PAUSED:'paused' };
   let state = STATE.IDLE;
-  let durationSec = 0;
-  let remainingSec = 0;
+  let durationSec = 20*60;
+  let remainingSec = durationSec;
   let timerId = null;
   let startedAt = null;
-  let currNapID = null;
-
-  fetch("/api/naplen")
-      .then(res => res.json())
-      .then(data => {
-        const naplen = data.preferrednaplen / 60; // if DB is in seconds
-        durationSec = data.preferrednaplen;
-        remainingSec = durationSec
-        durationInput.value = naplen;
-        countdownEl.textContent = fmt(data.preferrednaplen);
-      });
-
 
   // Soft quotes
   const quotes = [
     "“A short nap can refuel your day.”",
     "“Rest is part of the work.”",
     "“Close eyes, open focus.”",
+    "“Twenty minutes to reset.”"
   ];
   document.getElementById('quoteText').textContent = quotes[Math.floor(Math.random()*quotes.length)];
 
@@ -350,34 +362,12 @@
     }
   }
 
-  async function start() {
+  function start(){
     if (state===STATE.RUNNING) return;
     if (state===STATE.IDLE){
       durationSec = (Number(durationInput.value)||20)*60;
       remainingSec = durationSec;
       startedAt = new Date().toISOString();
-
-      try {
-          const res = await fetch("/api/startNap", {
-            method: "POST",
-          });
-
-          if (!res.ok) {
-            alert("❌ " + "failed to start nap");
-            return;
-          }
-
-          if (res.ok) {
-            const data = await res.json();   // <- parses { napID }
-            currNapID = data.napID;
-            alert("✅ started nap: " + currNapID);
-
-          } 
-        } catch (err) {
-          console.error(err);
-          alert("❌ Something went wrong. Please try again.");
-        }
-
     }
     timerId = setInterval(tick, 1000);
     setState(STATE.RUNNING);
@@ -425,41 +415,93 @@
 
   // Persistence (API first, fallback localStorage)
   async function saveNap(entry){
-    // try{
-    //   const res = await fetch('/api/naps',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry)});
-    //   if(!res.ok) throw new Error('no api');
-    // }catch{
-    //   const key='napster_naps'; const list=JSON.parse(localStorage.getItem(key)||'[]'); list.push(entry); localStorage.setItem(key, JSON.stringify(list));
-    // }
-
-    try {
-          const res = await fetch("/api/endNap", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ napID: currNapID })  // 👈 send JSON
-          });
-
-          if (!res.ok) {
-            alert("❌ " + "failed to end nap");
-            return;
-          }
-
-          if (res.ok) {
-            const data = await res.json();   // <- parses { napID }
-            currNapID = data.napID;
-            alert("✅ ended nap: " + currNapID);
-
-          } 
-        } catch (err) {
-          console.error(err);
-          alert("❌ Something went wrong. Please try again.");
-        }
+    try{
+      const res = await fetch('/api/naps',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry)});
+      if(!res.ok) throw new Error('no api');
+    }catch{
+      const key='napster_naps'; const list=JSON.parse(localStorage.getItem(key)||'[]'); list.push(entry); localStorage.setItem(key, JSON.stringify(list));
+    }
   }
 
   // Init
   render();
+})();
+</script>
+
+<!-- Sleep Music mini player logic -->
+<script>
+(() => {
+  // Keys sleepMusic.html will write to
+  const K = {
+    preview: "nap.music.previewUrl",
+    title: "nap.music.title",
+    artist: "nap.music.artist",
+    img: "nap.music.img",
+    loop: "nap.settings.loop",
+    fade: "nap.settings.fadeSec",
+    auto: "nap.settings.autoStart",
+  };
+
+  const audio   = document.getElementById("napMiniAudio");
+  const titleEl = document.getElementById("napMiniTitle");
+  const subEl   = document.getElementById("napMiniSub");
+  const imgEl   = document.getElementById("napMiniImg");
+  const statusEl= document.getElementById("napMiniStatus");
+
+  const getBool = (k, def) => {
+    const v = localStorage.getItem(k);
+    if (v === null) return !!def;
+    return v === "true";
+  };
+  const getNum = (k, def) => {
+    const n = Number(localStorage.getItem(k));
+    return Number.isNaN(n) ? def : n;
+  };
+
+  function refreshFromStorage() {
+    const src    = localStorage.getItem(K.preview) || "";
+    const title  = localStorage.getItem(K.title) || "";
+    const artist = localStorage.getItem(K.artist) || "";
+    const img    = localStorage.getItem(K.img) || "";
+    const loop   = getBool(K.loop, true);
+
+    // Summary: “Rain — 30s preview • Loop: On”
+    const summaryLeft  = title || "Rain";
+    const summaryMid   = "30s preview";
+    const summaryRight = `Loop: ${loop ? "On" : "Off"}`;
+
+    audio.src  = src;
+    audio.loop = loop;
+
+    titleEl.textContent = title || "No track selected";
+    subEl.textContent   = `${summaryLeft} — ${summaryMid} • ${summaryRight}`;
+    imgEl.src = img || "";
+    imgEl.style.visibility = img ? "visible" : "hidden";
+  }
+
+  function setStatus(t){ statusEl.textContent = t; }
+
+  // Controls
+  document.getElementById("napMiniPlay").addEventListener("click", async () => {
+    if (!audio.src) { setStatus("Choose music first (Change music)."); return; }
+    audio.loop = getBool(K.loop, true);
+    try { await audio.play(); setStatus("Playing"); }
+    catch { setStatus("If autoplay is blocked, press Play in the player bar."); }
+  });
+  document.getElementById("napMiniPause").addEventListener("click", () => {
+    audio.pause(); setStatus("Paused");
+  });
+
+  // Update on selection change from sleepMusic.html
+  window.addEventListener("storage", (e) => {
+    if ([K.preview, K.title, K.artist, K.img, K.loop].includes(e.key)) {
+      refreshFromStorage();
+      setStatus("Selection updated");
+    }
+  });
+
+  // Initial load
+  refreshFromStorage();
 })();
 </script>
 </body>

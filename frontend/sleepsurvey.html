@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Napster | Sleep Survey</title>
+  <!--The design of the page-->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #c59aff 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 30px;
+    }
+
+    header img {
+      height: 120px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #c59aff;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .section {
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    .section h2 {
+      color: #c59aff;
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-number {
+      background: #c59aff;
+      color: white;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 0.9em;
+    }
+
+    .question {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: 500;
+      font-size: 1.1em;
+    }
+
+    .radio-group, .checkbox-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .radio-option, .checkbox-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #667eea;
+    }
+
+    .star-rating {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
+    .star-rating input {
+      display: none;
+    }
+
+    .star-rating label {
+      font-size: 5em;
+      color: #ddd;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: #ffd700;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 1em;
+      resize: vertical;
+      transition: border-color 0.3s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #c59aff;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 15px 40px;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .btn-submit {
+      background: #c59aff;
+      color: white;
+    }
+
+    .btn-submit:hover {
+      background: #c59aff;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-cancel {
+      background: #e0e0e0;
+      color: #666;
+    }
+
+    .btn-cancel:hover {
+      background: #d0d0d0;
+    }
+
+    .consent-warning {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    .consent-warning.show {
+      display: block;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .rating-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <!--Header for the survery-->
+  <header>
+    <img src="https://via.placeholder.com/150x120/667eea/ffffff?text=Napster" alt="Napster Logo">
+    <h1>Napster Sleep Survey</h1>
+    <p style="color: #dc1dc9c2; margin-top: 10px;">Help us understand your sleep patterns</p>
+  </header>
+
+  <main>
+    <form id="surveyForm">
+      <!-- Section 1: Consent -->
+      <div class="section">
+        <h2><span class="section-number">1</span> Consent</h2>
+        <div class="question">
+          <label>Do you consent to Napster recording the information from this survey for nap-related features of this website?</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="consentYes" name="consent" value="yes" required>
+              <label for="consentYes" style="margin: 0; font-weight: normal;">Yes</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="consentNo" name="consent" value="no">
+              <label for="consentNo" style="margin: 0; font-weight: normal;">No</label>
+            </div>
+          </div>
+          <!--Warning in case consent is not given-->
+          <div class="consent-warning" id="consentWarning">
+            <strong> Notice:</strong> Without consent, we cannot proceed with the survey. Click "Cancel Survey" below to exit.
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Sleep Quality -->
+      <div class="section" id="surveyQuestions">
+        <h2><span class="section-number">2</span> Sleep Quality</h2>
+        <div class="question">
+          <label>How do you feel the quality of your nap was?</label>
+          <div class="star-rating">
+            <input type="radio" id="star5" name="quality" value="5" required>
+            <label for="star5">★</label>
+            <input type="radio" id="star4" name="quality" value="4">
+            <label for="star4">★</label>
+            <input type="radio" id="star3" name="quality" value="3">
+            <label for="star3">★</label>
+            <input type="radio" id="star2" name="quality" value="2">
+            <label for="star2">★</label>
+            <input type="radio" id="star1" name="quality" value="1">
+            <label for="star1">★</label>
+          </div>
+          <div class="rating-labels">
+            <span>Terrible</span>
+            <span>Great</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Interruptions -->
+      <div class="section">
+        <h2><span class="section-number">3</span> Sleep Interruptions</h2>
+        <div class="question">
+          <label>Did you wake up mid-nap?</label>
+          <div class="radio-group">
+            <div class="radio-option">
+              <input type="radio" id="wakeYes" name="wakeup" value="yes" required>
+              <label for="wakeYes" style="margin: 0; font-weight: normal;">Yes</label>
+            </div>
+            <div class="radio-option">
+              <input type="radio" id="wakeNo" name="wakeup" value="no">
+              <label for="wakeNo" style="margin: 0; font-weight: normal;">No</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Additional Notes -->
+      <div class="section">
+        <h2><span class="section-number">4</span> Additional Notes</h2>
+        <div class="question">
+          <label for="notes">Anything else you would like to mention?</label>
+          <textarea 
+            id="notes" 
+            name="notes" 
+            placeholder="Share any additional thoughts about your nap experience..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="button-group">
+        <button type="button" class="btn-cancel" onclick="cancelSurvey()">Cancel Survey</button>
+        <button type="submit" class="btn-submit">Submit Survey</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Handling the data after submitting-->
+  <script>
+    const consentYes = document.getElementById('consentYes');
+    const consentNo = document.getElementById('consentNo');
+    const consentWarning = document.getElementById('consentWarning');
+    const surveyQuestions = document.getElementById('surveyQuestions');
+    const form = document.getElementById('surveyForm');
+
+    // Handle consent change
+    function handleConsentChange() {
+      if (consentNo.checked) {
+        consentWarning.classList.add('show');
+        surveyQuestions.classList.add('hidden');
+      } else if (consentYes.checked) {
+        consentWarning.classList.remove('show');
+        surveyQuestions.classList.remove('hidden');
+      }
+    }
+
+    consentYes.addEventListener('change', handleConsentChange);
+    consentNo.addEventListener('change', handleConsentChange);
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      if (consentNo.checked) {
+        alert('You must consent to participate in the survey.');
+        return;
+      }
+
+      // Collect form data
+      const formData = {
+        consent: document.querySelector('input[name="consent"]:checked').value,
+        quality: document.querySelector('input[name="quality"]:checked')?.value,
+        wakeup: document.querySelector('input[name="wakeup"]:checked')?.value,
+        notes: document.getElementById('notes').value
+      };
+
+      // Temporary Solution for saving the Survery
+      console.log('Survey Data:', formData);
+      alert('Thank you for completing the Napster Sleep Survey!\n\nYour responses have been recorded.');
+      form.reset();
+      consentWarning.classList.remove('show');
+    });
+    // Prompt for when you cancel the survey
+    function cancelSurvey() {
+      if (confirm('Are you sure you want to cancel the survey? All entered data will be lost.')) {
+        form.reset();
+        consentWarning.classList.remove('show');
+        surveyQuestions.classList.remove('hidden');
+        alert('Survey cancelled.');
+      }
+    }
+  </script>
+</body>
+</html>

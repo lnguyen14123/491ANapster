@@ -3,7 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Napster | Nap Schedule </title>
+    <title>Napster | User Schedule </title>
     <!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="title" content="Napster | Nap Schedule" />
@@ -17,6 +17,20 @@
       content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard"
     />
     <!--end::Primary Meta Tags-->
+
+    <style>
+      .calendar-cell {
+        cursor: pointer;
+        transition: background-color 0.15s;
+      }
+      .calendar-cell.selected {
+        background-color: #f2ccfa !important; /* light green when selected */
+      }
+      .calendar-cell:hover {
+        background-color: #d3f3d3;
+      }
+    </style>
+    
     <!--begin::Fonts-->
     <link
       rel="stylesheet"
@@ -202,13 +216,17 @@
               </li>
 
               <li class="nav-item">
-                <a href="./napSchedule.html" class="nav-link active">
+                <a href="./napSchedule.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Nap Schedule</p>
                 </a>
               </li>
 
-              <li class="nav-item"><a href="./userSchedule.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>User Schedule</p></a></li>
+              <li class="nav-item">
+                <a href="./userSchedule.html" class="nav-link active">
+                  <i class="nav-icon bi bi-moon-stars"></i>
+                  <p>User Schedule</p>
+                </a></li>
 
 
               <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
@@ -291,8 +309,13 @@
         <div class="app-content-header">
           <!--begin::Container-->
           <div class="container-fluid">
+            <div class="row">
+              <div class="col-sm-6">
+                <h3 class="mb-0">Enter Your Nap Availability!</h3>
+              </div>
+            </div>
+
                     <!--begin::Weekly Calendar Block-->
-                    <!--Kate Dinh Helped with feature-->
         <div class="container py-4">
           <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
@@ -313,68 +336,181 @@
           </div>
   
           <!-- Time Slots -->
-          <div class="calendar-time-slots">
-  
-          <!-- 1:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">1:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
+           <!-- Time Slots -->
+           <div class="calendar-time-slots">
+
+            <!-- 8:00 AM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">8:00 AM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 9:00 AM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">9:00 AM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 10:00 AM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">10:00 AM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 11:00 AM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">11:00 AM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 12:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">12:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 1:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">1:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 2:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">2:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 3:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">3:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 4:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">4:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 5:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">5:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 6:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">6:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 7:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">7:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
+            <!-- 8:00 PM -->
+            <div class="row g-0 border-bottom" style="min-height: 30px;">
+              <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">8:00 PM</div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col border-end calendar-cell"></div>
+              <div class="col calendar-cell"></div>
+            </div>
+          
           </div>
-  
-          <!-- 2:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">2:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
+          <div class="save-container" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
+            <button id="saveButton" style="
+              padding: 8px 16px;
+              font-size: 16px;
+              border: none;
+              border-radius: 8px;
+              background-color: #f2ccfa;
+              color: white;
+              cursor: pointer;
+              transition: background-color 0.2s ease;
+            ">
+              Save!
+            </button>
           </div>
-  
-          <!-- 3:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">3:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 4:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">4:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 5:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">5:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
+          
         </div>
       </div>
     </div>
@@ -399,10 +535,6 @@
         <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
         <!--end::To the end-->
         <!--begin::Copyright-->
-        <strong>
-          Copyright &copy; 2025&nbsp;
-        </strong>
-        All rights reserved.
         <!--end::Copyright-->
       </footer>
       <!--end::Footer-->
@@ -492,12 +624,100 @@
   </script>
 
     <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
-
       
     </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    let isMouseDown = false;
+    let isSelecting = true; // true = selecting (make green), false = unselecting
+
+    const cells = document.querySelectorAll(".calendar-cell");
+
+    cells.forEach(cell => {
+      cell.addEventListener("mousedown", e => {
+        e.preventDefault();
+        isMouseDown = true;
+        isSelecting = !cell.classList.contains("selected"); // check starting state
+        cell.classList.toggle("selected", isSelecting);
+      });
+
+      cell.addEventListener("mouseenter", () => {
+        if (isMouseDown) {
+          cell.classList.toggle("selected", isSelecting);
+        }
+      });
+    });
+
+    document.addEventListener("mouseup", () => {
+      isMouseDown = false;
+    });
+  });
+
+  document.getElementById("saveButton").addEventListener("click", () => {
+  const selectedCells = document.querySelectorAll(".calendar-cell.selected");
+  const times = [];
+
+  selectedCells.forEach(cell => {
+    const row = cell.closest(".row");
+    const time = row.querySelector(".text-muted").innerText; // e.g., "8:00 AM"
+    const dayIndex = Array.from(row.children).indexOf(cell) - 1; // 0 = Monday, 6 = Sunday
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const day = days[dayIndex];
+    times.push({ day, time });
+  });
+
+  console.log(times);
+
+  // Send to backend
+  fetch("/api/save-naps", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ naps: times })
+  })
+  .then(res => {
+    if (res.ok) {
+      //alert("Nap times saved successfully!");
+    } else {
+      alert("Error saving nap times.");
+    }
+  })
+  .catch(err => console.error("Save error:", err));
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const res = await fetch("/api/get-naps");
+    if (!res.ok) throw new Error("Failed to fetch naps");
+    const naps = await res.json();
+
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+    naps.forEach(({ day, time }) => {
+      const formattedTime = formatHour(time); // e.g., 8 → "8:00 AM"
+      const row = Array.from(document.querySelectorAll(".row"))
+        .find(r => r.querySelector(".text-muted")?.innerText === formattedTime);
+      if (!row) return;
+      const cell = row.children[day + 1]; // +1 to skip time column
+      if (cell && cell.classList.contains("calendar-cell")) {
+        cell.classList.add("selected");
+      }
+    });
+  } catch (err) {
+    console.error("Error loading naps:", err);
+  }
+});
+
+function formatHour(hour) {
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return `${displayHour}:00 ${ampm}`;
+}
+
+
+
+</script>
+
     <!--end::Script-->
   </body>
   <!--end::Body-->
