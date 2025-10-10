@@ -327,10 +327,22 @@
 
   const STATE = { IDLE:'idle', RUNNING:'running', PAUSED:'paused' };
   let state = STATE.IDLE;
-  let durationSec = 20*60;
-  let remainingSec = durationSec;
+  let durationSec = 0;
+  let remainingSec = 0;
   let timerId = null;
   let startedAt = null;
+  let currNapID = null;
+
+  fetch("/api/naplen")
+      .then(res => res.json())
+      .then(data => {
+        const naplen = data.preferrednaplen / 60; // if DB is in seconds
+        durationSec = data.preferrednaplen;
+        remainingSec = durationSec
+        durationInput.value = naplen;
+        countdownEl.textContent = fmt(data.preferrednaplen);
+      });
+
 
   // Soft quotes
   const quotes = [
@@ -362,12 +374,32 @@
     }
   }
 
-  function start(){
+  async function start() {
     if (state===STATE.RUNNING) return;
     if (state===STATE.IDLE){
       durationSec = (Number(durationInput.value)||20)*60;
       remainingSec = durationSec;
       startedAt = new Date().toISOString();
+
+      try {
+          const res = await fetch("/api/startNap", {
+            method: "POST",
+          });
+
+          if (!res.ok) {
+            alert("❌ " + "failed to start nap");
+            return;
+          }
+
+          if (res.ok) {
+            const data = await res.json();   // <- parses { napID }
+            currNapID = data.napID;
+
+          } 
+        } catch (err) {
+          console.error(err);
+        }
+
     }
     timerId = setInterval(tick, 1000);
     setState(STATE.RUNNING);
@@ -416,10 +448,27 @@
   // Persistence (API first, fallback localStorage)
   async function saveNap(entry){
     try{
-      const res = await fetch('/api/naps',{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry)});
-      if(!res.ok) throw new Error('no api');
+      const res = await fetch("/api/endNap", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ napID: currNapID })  // 👈 send JSON
+          });
+
+          if (!res.ok) {
+            alert("❌ " + "failed to end nap");
+            return;
+          }
+
+          if (res.ok) {
+            const data = await res.json();   // <- parses { napID }
+            currNapID = data.napID;
+
+          } 
     }catch{
-      const key='napster_naps'; const list=JSON.parse(localStorage.getItem(key)||'[]'); list.push(entry); localStorage.setItem(key, JSON.stringify(list));
+      console.error(err);
+          alert("❌ Something went wrong. Please try again.");
     }
   }
 

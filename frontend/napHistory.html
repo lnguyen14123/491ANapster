@@ -693,15 +693,20 @@
           if (!res.ok) throw new Error("Failed to load naps");
           naps = (await res.json()).naps;
 
+          console.log(naps);
+
           // Clear the current table body
           const napBody = document.getElementById("napBody");
           napBody.innerHTML = "";
 
           // Populate rows dynamically
 
+          console.log(naps.slice(0, 10));
+
           naps.slice(0, 10).forEach(nap => {
             const start = new Date(nap.napstart);
             const end = nap.napend ? new Date(nap.napend) : null;
+
 
             const tr = document.createElement("tr");
             tr.innerHTML = `
