@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Napster | Location Recommendations</title>
+
+  <style>
+    /* ---------- Design tokens / base styles ---------- */
+    :root{ --violet:#8b5cf6; --violet-50:#f5f3ff; }
+    *{ box-sizing:border-box; }
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 16px; color:#111827;
+    }
+
+    /* ---------- Header w/ brand ---------- */
+    header{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    header img{ height:36px; width:auto; }
+    h1{ color:var(--violet); font-size:1.5rem; margin:0; }
+
+    /* ---------- UI helpers ---------- */
+    .hint{ font-size:.95rem; color:#4b5563; margin-bottom:12px; }
+    .controls{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin: 12px 0; }
+    button, select{
+      font-size:1rem; padding:.55rem .8rem; border:1px solid #e5e7eb;
+      border-radius:10px; background:white; cursor:pointer;
+    }
+    button.primary{ border-color:var(--violet); background:var(--violet-50); }
+    #status{ font-size:.95rem; color:#374151; margin: 6px 0 12px; }
+
+    /* Responsive grid of cards */
+    #results{ display:grid; gap:12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+
+    /* Card look */
+    .card{ border:1px solid #e5e7eb; border-radius:14px; padding:12px; background:white; }
+    .title{ font-weight:600; margin-bottom:4px; color:#111827; }
+    .meta{ color:#4b5563; font-size:.95rem; }
+
+    /* Little badges (Indoor/Outdoor, seating type) */
+    .pill{ display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid #e5e7eb; font-size:.8rem; margin-right:6px; }
+
+    .cta{ margin-top:8px; }
+    .cta button{ border:1px solid var(--violet); background:var(--violet-50); }
+
+    .footer-note{ margin-top:18px; color:#6b7280; font-size:.85rem; }
+    .back{ margin-top:8px; display:inline-block; }
+    a{ color:var(--violet); text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Brand: hide image if it fails to load (keeps layout clean) -->
+    <img src="./dist/assets/img/napsterlogo.png" alt="Napster logo" onerror="this.style.display='none'" />
+    <h1>Location Recommendations</h1>
+  </header>
+
+  <p class="hint">Tap “Use my location” to see the closest nap-friendly spots. You can edit the sample spots inside this page later.</p>
+
+  <!-- Controls: get geolocation + choose max walking time + manual refresh -->
+  <div class="controls">
+    <button class="primary" id="useLocationBtn">Use my location</button>
+    <label>Max walk
+      <select id="maxWalkSelect">
+        <option value="5">5 min</option>
+        <option value="10" selected>10 min</option>
+        <option value="15">15 min</option>
+        <option value="20">20 min</option>
+      </select>
+    </label>
+    <button id="refreshBtn" title="Re-run recommendation">Refresh</button>
+  </div>
+
+  <!-- Status messages (geolocation progress / errors / summaries) -->
+  <div id="status"></div>
+
+  <!-- Cards are rendered here -->
+  <div id="results"></div>
+
+  <a class="back" href="./nappingPage.html">↩ Back to Home</a>
+
+  <p class="footer-note">
+    MVP: All data is local and offline. Replace the <code>PLACES</code> array below with your real spots when ready.
+  </p>
+
+  <script>
+    /* -------------------------------------------------------------------------
+       Data: demo places to rank. 
+       Replace with real data or fetch from backend later.
+    ------------------------------------------------------------------------- */
+    const PLACES = [
+      { id: 1, name: "Library Quiet Zone", lat: 33.7837, lon: -118.1140, indoor: true,  seating: "sofa" },
+      { id: 2, name: "Student Lounge",     lat: 33.7824, lon: -118.1125, indoor: true,  seating: "couch" },
+      { id: 3, name: "Shaded Lawn",        lat: 33.7812, lon: -118.1110, indoor: false, seating: "grass" },
+      { id: 4, name: "Café Corner",        lat: 33.7845, lon: -118.1152, indoor: true,  seating: "chair" }
+    ];
+
+    /* Cache DOM elements once (faster, cleaner) */
+    const el = {
+      status: document.getElementById('status'),
+      results: document.getElementById('results'),
+      useBtn: document.getElementById('useLocationBtn'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      maxWalk: document.getElementById('maxWalkSelect')
+    };
+
+    /* --- Geo math helpers -------------------------------------------------- */
+
+    // Degrees → radians
+    function toRad(d){ return d * Math.PI / 180; }
+
+    // Haversine: great-circle distance (meters) between two lat/lon points.
+    function haversine(lat1, lon1, lat2, lon2){
+      const R = 6371000; // Earth radius (m)
+      const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
+
+    // Convert distance to walking minutes using ~80 m/min 
+    function minutesFromMeters(m){ const metersPerMin = 80; return m / metersPerMin; }
+
+    /* --- UI render --------------------------------------------------------- */
+
+    // Render a list of ranked places as cards; show an empty state if none.
+    function render(list){
+      if (!list.length){
+        el.results.innerHTML = "<div class=\"meta\">No nearby nap spots within your max walk time.</div>";
+        return;
+      }
+      el.results.innerHTML = list.map(p => `
+        <div class="card">
+          <div class="title">${p.name}</div>
+          <div class="meta">${p.walkMinutes} min • ${p.distanceMeters} m</div>
+          <div class="meta">
+            <span class="pill">${p.indoor ? 'Indoor' : 'Outdoor'}</span>
+            <span class="pill">${p.seating || 'seating'}</span>
+          </div>
+          <div class="cta"><button onclick="startNap(${p.id})">Start nap here</button></div>
+        </div>
+      `).join('');
+    }
+
+    // Hook into existing flow as needed (navigate, set state, etc.)
+    function startNap(placeId){
+      const place = PLACES.find(p => p.id === placeId);
+      alert(`Starting nap at: ${place ? place.name : ('Place #' + placeId)}`);
+      // TODO: integrate with real "Start Nap" logic (e.g., go back to Home + set context)
+    }
+
+    /* --- Geolocation (wrapped in a Promise for async/await ergonomics) ----- */
+    async function getPosition(){
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+          err => reject(err),                 // user denied / timeout / other error
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+    }
+
+    /* --- Main load flow: get user position → rank places → render ---------- */
+    async function load(){
+      el.status.textContent = 'Finding your location…';
+      el.results.innerHTML = '';
+      try{
+        // 1) get current location
+        const user = await getPosition();
+
+        // 2) compute distances and walking minutes for each place
+        const maxWalk = Number(el.maxWalk.value || 10);
+        const ranked = PLACES.map(p => {
+          const distM = Math.round(haversine(user.lat, user.lon, p.lat, p.lon));
+          const mins = Math.max(1, Math.round(minutesFromMeters(distM))); // min clamp = 1
+          return { ...p, distanceMeters: distM, walkMinutes: mins };
+        })
+        .filter(p => p.walkMinutes <= maxWalk)         // keep places within threshold
+        .sort((a,b) => a.walkMinutes - b.walkMinutes)  // closest first
+        .slice(0, 5);                                   // show up to 5
+
+        // 3) update UI
+        el.status.textContent = ranked.length ? 'Closest spots:' : 'No spots within your max walk time.';
+        render(ranked);
+      } catch(e){
+        // Geolocation blocked or failed
+        el.status.textContent = 'Location unavailable. Enable location in your browser and try again.';
+        render([]);
+      }
+    }
+
+    /* --- Wire up buttons --------------------------------------------------- */
+    el.useBtn.addEventListener('click', load);     // initial locate + render
+    el.refreshBtn.addEventListener('click', load); // recompute using current settings
+  </script>
+</body>
+</html>
