@@ -253,5 +253,51 @@ router.get("/get-naps", async (req, res) => {
   }
 });
 
+router.post("/napSchedule", async (req, res) => {
+  try {
+
+    const userID = req.session.user?.id;
+    if (!userID) {
+      return res.status(401).send("Not logged in");
+    }
+  
+    const {naps} = req.body;
+
+    // Each nap has: { day, startTime, endTime }
+    const values = naps.map(n => `('${userID}', '${n.startTime}', '${n.endTime}', ${n.day})`).join(",");
+
+    const query = `
+      INSERT INTO "napSchedule" ("userid", "startTime", "endTime", "day")
+      VALUES ${values}
+      RETURNING *;
+    `;
+
+    const result = await pool.query(query);
+    res.json({ success: true, naps: result.rows });
+  } catch (err) {
+    console.error("Error saving naps:", err);
+    res.status(500).json({ error: "Failed to save naps" });
+  }
+});
+
+router.get("/napSchedule", async (req, res) => {
+  const userID = req.session.user?.id;
+  if (!userID) {
+    return res.status(401).send("Not logged in");
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT day, "startTime", "endTime" FROM "napSchedule" WHERE userid = $1`,
+      [userID]
+    );
+    res.json({ success: true, naps: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+
 
 export default router;
