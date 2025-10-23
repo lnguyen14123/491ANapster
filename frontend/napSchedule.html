@@ -53,6 +53,25 @@
     />
     <link rel="icon" type="image/png" href="./dist/assets/img/napster_favicon.png">
 
+    <style>
+      .slot-container {
+          position: relative;
+          height: 150%;
+      }
+
+      .nap {
+          position: absolute;
+          left: 2px;
+          right: 2px;
+          background-color: #8b5cf6;
+          color: #fff;
+          border-radius: 4px;
+          padding: 2px 4px;
+          font-size: 0.8rem;
+      }
+
+    </style>
+
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <!--begin::App Wrapper-->
@@ -201,6 +220,9 @@
                 </a>
               </li>
 
+              <li class="nav-item"><a href="./autoNapScheduler.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>AI Nap Scheduler</p></a></li>
+
+
               <li class="nav-item">
                 <a href="./napSchedule.html" class="nav-link active">
                   <i class="nav-icon bi bi-moon-stars"></i>
@@ -289,95 +311,75 @@
       <!--begin::App Main-->
       <main class="app-main">
         <!--begin::App Content Header-->
-        <div class="app-content-header">
-          <!--begin::Container-->
-          <div class="container-fluid">
-                    <!--begin::Weekly Calendar Block-->
-                    <!--Kate Dinh Helped with feature-->
-        <div class="container py-4">
-          <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-              <h5 class="mb-0">Weekly Calendar</h5>
-            </div>
-          <div class="card-body p-0">
-  
-          <!--Days-->
-          <div class="row g-0 text-center fw-bold border-bottom bg-light">
-            <div class="col-1 border-end"></div>
-            <div class="col border-end">Monday</div>
-            <div class="col border-end">Tuesday</div>
-            <div class="col border-end">Wednesday</div>
-            <div class="col border-end">Thursday</div>
-            <div class="col border-end">Friday</div>
-            <div class="col border-end">Saturday</div>
-            <div class="col">Sunday</div>
-          </div>
-  
-          <!-- Time Slots -->
-          <div class="calendar-time-slots">
-  
-          <!-- 1:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">1:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 2:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">2:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 3:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">3:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 4:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">4:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
-          <!-- 5:00 PM -->
-          <div class="row g-0 border-bottom" style="min-height: 80px;">
-            <div class="col-1 text-end pe-2 border-end pt-2 small text-muted">5:00 PM</div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col border-end"></div>
-            <div class="col"></div>
-          </div>
-  
+
+        <!-- Calendar Header Component -->
+<div class="calendar-header text-center py-3 mb-2">
+  <h3 class="fw-bold mb-1" style="color:#312e81;">Nap Schedule!</h3>
+  <p class="text-muted mb-0" style="font-size:0.95rem;">
+    These are your currently scheduled naps for the week!
+  </p>
+</div>
+
+        <div class="calendar-time-slots" id="calendar-slots"></div>
+
+          <script>
+          const days = ["Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+          const startHour = 8; // 8 AM
+          const endHour = 20;  // 8 PM
+          const slotHeight = 40; // px per hour
+          
+          const calendar = document.getElementById("calendar-slots");
+
+          // Create header row
+          const headerRow = document.createElement("div");
+          headerRow.className = "row g-0 border-bottom fw-bold text-center";
+
+          // Empty top-left corner (above the time column)
+          const corner = document.createElement("div");
+          corner.className = "col-1 border-end";
+          headerRow.appendChild(corner);
+
+          // Add each day name as a header column
+          for (let d = 0; d < days.length; d++) {
+            const dayHeader = document.createElement("div");
+            dayHeader.className = "col border-end py-2";
+            dayHeader.textContent = days[d];
+            headerRow.appendChild(dayHeader);
+          }
+
+          calendar.appendChild(headerRow);
+
+          
+          for (let h = startHour; h <= endHour; h++) {
+              const row = document.createElement("div");
+              row.className = "row g-0 border-bottom";
+              row.style.minHeight = slotHeight + "px";
+
+              // Time label
+              const colTime = document.createElement("div");
+              colTime.className = "col-1 text-end pe-2 border-end pt-2 small text-muted";
+
+              let displayHour = h > 12 ? h - 12 : h;
+              let ampm = h >= 12 ? "PM" : "AM";
+              colTime.textContent = `${displayHour}:00 ${ampm}`;
+              row.appendChild(colTime);
+
+              // Days
+              for (let d = 0; d < days.length; d++) {
+                const col = document.createElement("div");
+                // 👇 give each day a unique class for lookup later
+                col.className = `col border-end position-relative col-day-${d}`;
+                const slotContainer = document.createElement("div");
+                slotContainer.className = "slot-container";
+                col.appendChild(slotContainer);
+                row.appendChild(col);
+              }
+
+              calendar.appendChild(row);
+            }
+          </script>
         </div>
-      </div>
+
     </div>
           </div>
           <!--end::Weekly Calendar Block-->
@@ -387,25 +389,6 @@
         </div>
 
       <!--begin::Footer-->
-      <footer style="
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background-color: #f8f9fa;
-      padding: 1rem;
-      text-align:left">
-      <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
-        <strong>
-          Copyright &copy; 2025&nbsp;
-        </strong>
-        All rights reserved.
-        <!--end::Copyright-->
-      </footer>
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
@@ -493,12 +476,101 @@
   </script>
 
     <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
 
-      
+      function addNap(dayIndex, startTime, endTime, title="Nap") {
+          // dayIndex: 0 = Monday ... 6 = Sunday
+          const hourToPx = slotHeight; // 1 hour = 80px
+          const start = startTime.split(":"); // "13:30"
+          const end = endTime.split(":");
+
+          const startHour = parseInt(start[0]);
+          const startMin = parseInt(start[1]);
+          const endHour = parseInt(end[0]);
+          const endMin = parseInt(end[1]);
+
+          const top = ((startHour - 8) + startMin/60) * hourToPx; 
+          const height = ((endHour - startHour) + (endMin - startMin)/60) * hourToPx;
+
+          // find the correct day column
+          const row = calendar.children[0]; // just placeholder, will loop all rows if needed
+          // better: find any slot-container for the day
+          const allSlots = document.querySelectorAll(".slot-container");
+          const container = allSlots[dayIndex]; // simplistic, can improve with row mapping
+
+          const napEl = document.createElement("div");
+          napEl.className = "nap";
+          napEl.style.top = `${top}px`;
+          napEl.style.height = `${height}px`;
+          napEl.textContent = title;
+          container.appendChild(napEl);
+      }
     </script>
+
+<script>
+  async function loadNaps() {
+    try {
+      const response = await fetch(`/api/napSchedule`);
+      const data = await response.json();
+      if (!data.success) return;
+  
+      const naps = data.naps; // array of {day, startTime, endTime}
+  
+      // clear previous naps
+      document.querySelectorAll(".calendar-time-slots .nap-block").forEach(el => el.remove());
+  
+      naps.forEach(nap => {
+        // convert startTime/endTime to pixels for positioning
+        const start = parseTime(nap.startTime); // e.g., "13:30:00" → 13.5
+        const end = parseTime(nap.endTime);     // e.g., "14:15:00" → 14.25
+        const duration = end - start;
+  
+        // get column for the day (0 = Sunday, 1 = Monday...)
+        const dayCol = document.querySelector(`.calendar-time-slots .col-day-${nap.day}`);
+        if (!dayCol) return;
+  
+        const slotHeight = 40; // height per hour in px (adjust if needed)
+        const topOffset = (start - 8) * slotHeight; // 8 AM is top
+  
+        // create nap block
+        const napBlock = document.createElement("div");
+        napBlock.className = "nap-block";
+        napBlock.style.position = "absolute";
+        napBlock.style.top = `${topOffset}px`;
+        napBlock.style.height = `${duration * slotHeight}px`;
+        napBlock.style.width = "100%";
+        napBlock.style.backgroundColor = "rgba(139,92,246,0.5)";
+        napBlock.style.borderRadius = "6px";
+        napBlock.style.textAlign = "center";
+        napBlock.style.fontSize = "0.9rem"; // 👈 smaller text (adjust as needed)
+
+        napBlock.textContent = formatTime(nap.startTime) + " - " + formatTime(nap.endTime);
+  
+        dayCol.appendChild(napBlock);
+
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  
+  // Helper to convert "HH:MM:SS" → decimal hours
+  function parseTime(t) {
+    const [h, m] = t.split(":").map(Number);
+    return h + m / 60;
+  }
+  
+  // Helper to format "HH:MM:SS" → "1:30 PM"
+  function formatTime(t) {
+    const [h, m] = t.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${m.toString().padStart(2, "0")} ${ampm}`;
+  }
+  
+  // call loadNaps() when page loads
+  document.addEventListener("DOMContentLoaded", loadNaps);
+  </script>
+  
     <!--end::Script-->
   </body>
   <!--end::Body-->

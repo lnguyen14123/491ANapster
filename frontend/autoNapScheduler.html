@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Napster | Home Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Fonts / Icons / AdminLTE -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/styles/overlayscrollbars.min.css"
+    />
+    <link rel="stylesheet" href="./dist/css/adminlte.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./dist/assets/img/napsterlogo.png"
+    />
+
+    <style>
+      :root {
+        /* Light purple theme */
+        --violet: #8b5cf6;
+        --violet-600: #7c3aed;
+        --violet-400: #a78bfa;
+        --violet-300: #c4b5fd;
+        --violet-100: #ede9fe;
+
+        --ink: #0f172a;
+        --muted: #6b7280;
+        --glass: rgba(255, 255, 255, 0.6);
+        --ring-bg: #ffffff;
+      }
+
+      /* Gradient canvas + ambient blobs */
+      .app-main {
+        background: radial-gradient(
+            1200px 600px at 10% -10%,
+            rgba(139, 92, 246, 0.15),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 500px at 110% 20%,
+            rgba(196, 181, 253, 0.22),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+        min-height: 100vh;
+      }
+      .ambient {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(40px);
+        opacity: 0.4;
+        animation: float 18s ease-in-out infinite;
+      }
+      .blob.violet {
+        width: 360px;
+        height: 360px;
+        background: #c4b5fd;
+        left: 10%;
+        top: 20%;
+      }
+      .blob.sky {
+        width: 420px;
+        height: 420px;
+        background: #ede9fe;
+        right: 8%;
+        bottom: 10%;
+        animation-delay: -6s;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) translateX(0);
+        }
+        50% {
+          transform: translateY(-20px) translateX(10px);
+        }
+      }
+
+      /* Center stage */
+      .center-wrap {
+        position: relative;
+        z-index: 2;
+        min-height: calc(100vh - 112px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem 1rem;
+      }
+
+      /* Glass card frame */
+      .glass {
+        width: min(1020px, 95vw);
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 28px;
+        background: var(--glass);
+        backdrop-filter: blur(10px) saturate(1.1);
+        border: 1px solid rgba(139, 92, 246, 0.18);
+        box-shadow: 0 20px 60px rgba(2, 6, 23, 0.08);
+        border-radius: 24px;
+        padding: 24px;
+      }
+      @media (max-width: 900px) {
+        .glass {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Circular timer (violet) */
+      .nap-circle {
+        aspect-ratio: 1/1;
+        width: 420px;
+        max-width: 100%;
+        margin-inline: auto;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        position: relative;
+        background: radial-gradient(
+            closest-side,
+            var(--ring-bg) 69%,
+            transparent 70% 71%,
+            #f2ecff 0
+          ),
+          conic-gradient(
+            var(--progress, 0%),
+            var(--violet),
+            var(--violet-400) 40%,
+            var(--violet-300) 70%,
+            var(--violet-100)
+          );
+        box-shadow: 0 16px 48px rgba(124, 58, 237, 0.24);
+        animation: breathe 4.5s ease-in-out infinite;
+        animation-play-state: paused; /* run only while timer is running */
+      }
+      .nap-circle.running {
+        animation-play-state: running;
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          box-shadow: 0 16px 48px rgba(124, 58, 237, 0.24);
+        }
+        50% {
+          box-shadow: 0 24px 64px rgba(167, 139, 250, 0.28);
+        }
+      }
+      .nap-core {
+        width: 76%;
+        height: 76%;
+        border-radius: 50%;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 1rem 1.25rem;
+        box-shadow: inset 0 0 0 1px rgba(2, 6, 23, 0.06);
+      }
+      .countdown {
+        font-size: clamp(2.2rem, 4.2vw, 3.2rem);
+        font-weight: 900;
+        letter-spacing: 0.5px;
+        line-height: 1;
+      }
+      .status {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-top: 0.25rem;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 0.75rem;
+      }
+      .btn-violet {
+        background: var(--violet);
+        color: #fff;
+        border: none;
+        border-radius: 9999px;
+        padding: 0.6rem 1rem;
+        font-weight: 600;
+      }
+      .btn-violet:hover {
+        background: var(--violet-600);
+      }
+      .btn-ghost {
+        background: #fff;
+        border: 1px solid var(--violet-300);
+        color: var(--violet-600);
+        border-radius: 9999px;
+        padding: 0.55rem 0.95rem;
+        font-weight: 600;
+      }
+      .btn-ghost:hover {
+        background: #f5f3ff;
+      }
+
+      /* Right panel */
+      .panel {
+        background: #ffffffc4;
+        border: 1px solid rgba(2, 6, 23, 0.06);
+        border-radius: 18px;
+        padding: 18px;
+      }
+      .panel h5 {
+        margin: 0 0 0.5rem 0;
+        font-weight: 800;
+        color: #312e81;
+      }
+
+      .presets {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .chip {
+        border-radius: 9999px;
+        padding: 0.4rem 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        background: #eef2ff;
+        color: #4f46e5;
+        border: 1px solid #c7d2fe;
+      }
+      .chip:hover {
+        background: #e0e7ff;
+      }
+      .chip.active {
+        background: #c7d2fe;
+      }
+
+      .inline {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 0.75rem;
+      }
+      .inline input {
+        width: 5.5rem;
+        text-align: center;
+      }
+
+      .quote {
+        margin-top: 0.8rem;
+        font-style: italic;
+        color: #475569;
+        font-size: 0.95rem;
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-start;
+      }
+
+      /* --- Sleep Music mini player --- */
+      .nap-mini {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid rgba(2, 6, 23, 0.06);
+        background: #ffffffc4;
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .nap-mini img {
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #f3f3f3;
+      }
+      .nap-mini .meta {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+      .nap-mini .title {
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nap-mini .sub {
+        color: #666;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nap-mini .actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .nap-mini .btn {
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        border: 1px solid #ddd;
+        background: #fafafa;
+        cursor: pointer;
+      }
+      .nap-mini .primary {
+        background: var(--violet);
+        color: #fff;
+        border-color: transparent;
+        text-decoration: none;
+      }
+      .nap-mini .status {
+        color: #555;
+        margin-top: 4px;
+        min-height: 1.2em;
+      }
+    </style>
+  </head>
+
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+      <!-- Header -->
+      <nav class="app-header navbar navbar-expand bg-body">
+        <div class="container-fluid">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-lte-toggle="sidebar"
+                href="#"
+                role="button"
+              >
+                <i class="bi bi-list"></i>
+              </a>
+            </li>
+            <li class="nav-item d-none d-md-block">
+              <a href="./nappingPage.html" class="nav-link active">Home</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                <i
+                  data-lte-icon="minimize"
+                  class="bi bi-fullscreen-exit"
+                  style="display: none"
+                ></i>
+              </a>
+            </li>
+            <li class="nav-item dropdown user-menu">
+              <a
+                href="#"
+                class="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+              >
+                <img
+                  src="/dist/assets/img/user2-160x160.jpg"
+                  class="user-image rounded-circle shadow"
+                  alt="User Image"
+                />
+                <span class="username-display d-none d-md-inline"></span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+                <li class="user-header text-bg-primary">
+                  <img
+                    src="/dist/assets/img/user2-160x160.jpg"
+                    class="rounded-circle shadow"
+                    alt="User Image"
+                  />
+                  <p class="username-display"></p>
+                  <small>Member since Nov. 2023</small>
+                </li>
+                <li class="user-footer">
+                  <a href="#" class="btn btn-default btn-flat">Profile</a>
+                  <a
+                    id="logout-btn"
+                    href="#"
+                    class="btn btn-default btn-flat float-end"
+                    >Sign out</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Sidebar (same as Dashboard) -->
+      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+        <div class="sidebar-brand">
+          <a href="./nappingPage.html" class="brand-link">
+            <img
+              src="/dist/assets/img/napsterlogo_image.png"
+              class="brand-image opacity-75 shadow"
+              alt="Logo"
+            />
+            <span class="brand-text fw-light">Napster</span>
+          </a>
+        </div>
+        <div class="sidebar-wrapper">
+          <nav class="mt-2">
+            <ul
+              class="nav sidebar-menu flex-column"
+              data-lte-toggle="treeview"
+              role="menu"
+              data-accordion="false"
+            >
+              <li class="nav-item menu-open">
+                <a href="./nappingPage.html" class="nav-link active"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Home</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="./dashboard.html" class="nav-link"
+                  ><i class="nav-icon bi bi-speedometer"></i>
+                  <p>Dashboard</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="./napHistory.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Nap History</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="./autoNapScheduler.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>AI Nap Scheduler</p></a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a href="./napSchedule.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Nap Schedule</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="./userSchedule.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>User Schedule</p></a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a href="./rewards.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Rewards</p></a
+                >
+              </li>
+              <li class="nav-item">
+                <a href="./location.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Location Recommendation</p></a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a href="./settings.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Settings</p></a
+                >
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="app-main">
+        <!-- ambient background blobs -->
+        <div class="ambient">
+          <div class="blob violet"></div>
+          <div class="blob sky"></div>
+        </div>
+
+        <div class="center-wrap">
+          <div class="glass">
+            <!-- Left: Weekly Availability Grid -->
+            <section>
+              <h3 style="font-weight: 800; color: #312e81; margin-bottom: 1rem">
+                Get Recommended Naps From Our Model!
+              </h3>
+
+              <div id="schedule-grid" class="schedule-grid"></div>
+
+              <div
+                style="
+                  display: flex;
+                  gap: 0.5rem;
+                  margin-top: 1rem;
+                  flex-wrap: wrap;
+                "
+              >
+                <button id="get-recommendations" class="btn-violet">
+                  Get Recommended Nap Times
+                </button>
+                <button id="save-naps" class="btn-ghost">
+                  Save Naps to My Schedule
+                </button>
+              </div>
+
+              <!-- Recommended naps appear here -->
+              <div id="loader" class="loader" style="display: none">
+                <style>
+                  .loader {
+                    border: 4px solid #f3f3f3; /* Light gray */
+                    border-top: 4px solid #8b5cf6; /* Purple */
+                    border-radius: 50%;
+                    width: 24px;
+                    height: 24px;
+                    animation: spin 1s linear infinite;
+                    margin: 10px auto; /* center */
+                  }
+
+                  @keyframes spin {
+                    0% {
+                      transform: rotate(0deg);
+                    }
+                    100% {
+                      transform: rotate(360deg);
+                    }
+                  }
+                </style>
+              </div>
+
+              <div
+                id="recommendations-container"
+                class="panel"
+                style="margin-top: 1rem; display: none"
+              >
+                <h5>Recommended Nap Times 💤</h5>
+                <ul id="recommendations-list" class="recommendations"></ul>
+              </div>
+            </section>
+
+            <!-- Right: Info/Tip Panel -->
+            <aside class="panel">
+              <h5>Sleep Tip 🌙</h5>
+              <div class="quote">
+                <i class="bi bi-stars"></i>
+                “Aim to nap between 1–3 PM for best rest without disrupting your
+                night’s sleep.”
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <footer class="app-footer">
+          <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
+          <strong>Copyright &copy; 2025&nbsp;</strong> All rights reserved.
+        </footer>
+      </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+    <script src="../../dist/js/adminlte.js"></script>
+    <script>
+      // Sidebar scrollbars
+      document.addEventListener("DOMContentLoaded", () => {
+        const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+        if (
+          sidebarWrapper &&
+          typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+        ) {
+          OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+            scrollbars: {
+              theme: "os-theme-light",
+              autoHide: "leave",
+              clickScroll: true,
+            },
+          });
+        }
+      });
+
+      // Auth display (safe if endpoint exists)
+      fetch("/api/user")
+        .then((res) => {
+          if (res.status === 401) {
+            location.href = "/signin";
+            return null;
+          }
+          return res.json();
+        })
+        .then(
+          (d) =>
+            d?.username &&
+            document
+              .querySelectorAll(".username-display")
+              .forEach((el) => (el.textContent = d.username))
+        )
+        .catch(() => {});
+      document.getElementById("logout-btn")?.addEventListener("click", () => {
+        fetch("/logout", { method: "POST" }).then(
+          () => (location.href = "/signin")
+        );
+      });
+
+      // Handle recommendation button with loading animation
+      const recBtn = document.getElementById("get-recommendations");
+      const recContainer = document.getElementById("recommendations-container");
+      const recList = document.getElementById("recommendations-list");
+      const loader = document.getElementById("loader");
+
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      recBtn.addEventListener("click", async () => {
+        const originalText = recBtn.textContent;
+        recBtn.textContent = "Generating recommendations...";
+        recBtn.disabled = true;
+
+        // Show loader and clear previous recommendations
+        loader.style.display = "block";
+        recList.innerHTML = "";
+        recContainer.style.display = "block";
+
+        try {
+          const [recs] = await Promise.all([
+            (async () => {
+              const response = await fetch("/api/recommendations");
+              if (!response.ok)
+                throw new Error("Failed to fetch recommendations");
+              return response.json();
+            })(),
+            delay(2000), // force at least 2 sec delay
+          ]);
+
+          recList.innerHTML = recs
+            .map((r) => `<li><strong>${r.day}:</strong> ${r.time}</li>`)
+            .join("");
+        } catch (err) {
+          console.error(err);
+          recList.innerHTML = "<li>Could not load recommendations.</li>";
+        } finally {
+          loader.style.display = "none"; // hide loader
+          recBtn.disabled = false;
+          recBtn.textContent = originalText;
+        }
+      });
+
+      // Save naps (UI-driven)
+      document
+        .getElementById("save-naps")
+        .addEventListener("click", async () => {
+          const recItems = Array.from(
+            document.querySelectorAll("#recommendations-list li")
+          );
+          if (recItems.length === 0) {
+            alert(
+              "⚠️ No recommended naps to save. Click 'Get Recommended Nap Times' first!"
+            );
+            return;
+          }
+
+          const dayMap = {
+            Sunday: 0,
+            Monday: 1,
+            Tuesday: 2,
+            Wednesday: 3,
+            Thursday: 4,
+            Friday: 5,
+            Saturday: 6,
+          };
+
+          const naps = recItems
+            .map((li) => {
+              const text = li.textContent.trim();
+              const colonIndex = text.indexOf(":");
+              if (colonIndex === -1) return null; // skip invalid li
+
+              const dayText = text.slice(0, colonIndex).trim();
+              const timeText = text.slice(colonIndex + 1).trim();
+
+              if (!timeText) return null; // skip if time is empty
+
+              const [startStr, endStr] = timeText
+                .split("–")
+                .map((t) => t.trim());
+
+              const parseTime = (t) => {
+                let [hour, min] = t.split(":");
+                const isPM = t.toLowerCase().includes("pm");
+                hour = parseInt(hour);
+                min = parseInt(min);
+                if (isPM && hour !== 12) hour += 12;
+                if (!isPM && hour === 12) hour = 0;
+                return `${hour.toString().padStart(2, "0")}:${min
+                  .toString()
+                  .padStart(2, "0")}:00`;
+              };
+
+              return {
+                day: dayMap[dayText],
+                startTime: parseTime(startStr),
+                endTime: parseTime(endStr),
+              };
+            })
+            .filter(Boolean); // remove any nulls
+
+          try {
+            const response = await fetch("/api/napSchedule", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ naps }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+              alert("✅ Naps saved to your schedule!");
+            } else {
+              alert("❌ Failed to save naps.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("⚠️ Error saving naps.");
+          }
+        });
+    </script>
+  </body>
+</html>

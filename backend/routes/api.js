@@ -254,29 +254,58 @@ router.get("/get-naps", async (req, res) => {
 });
 
 router.post("/napSchedule", async (req, res) => {
-  try {
+  const client = await pool.connect();
 
+  try {
     const userID = req.session.user?.id;
     if (!userID) {
       return res.status(401).send("Not logged in");
     }
-  
-    const {naps} = req.body;
 
-    // Each nap has: { day, startTime, endTime }
-    const values = naps.map(n => `('${userID}', '${n.startTime}', '${n.endTime}', ${n.day})`).join(",");
+    const { naps } = req.body;
+    if (!Array.isArray(naps) || naps.length === 0) {
+      return res.status(400).json({ error: "No naps provided" });
+    }
 
-    const query = `
+    // Begin transaction
+    await client.query("BEGIN");
+
+    // 1️⃣ Delete existing naps for this user
+    await client.query(`DELETE FROM "napSchedule" WHERE userid = $1`, [userID]);
+
+    // 2️⃣ Insert the new naps
+    const values = naps
+      .map(
+        (n, i) =>
+          `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`
+      )
+      .join(",");
+
+    const params = naps.flatMap((n) => [
+      userID,
+      n.startTime,
+      n.endTime,
+      n.day,
+    ]);
+
+    const insertQuery = `
       INSERT INTO "napSchedule" ("userid", "startTime", "endTime", "day")
       VALUES ${values}
       RETURNING *;
     `;
 
-    const result = await pool.query(query);
+    const result = await client.query(insertQuery, params);
+
+    // Commit transaction
+    await client.query("COMMIT");
+
     res.json({ success: true, naps: result.rows });
   } catch (err) {
     console.error("Error saving naps:", err);
+    await client.query("ROLLBACK");
     res.status(500).json({ error: "Failed to save naps" });
+  } finally {
+    client.release();
   }
 });
 
@@ -298,6 +327,209 @@ router.get("/napSchedule", async (req, res) => {
   }
 });
 
+router.get("/recommendations", async (req, res) => {
+  const userID = req.session.user?.id;
+  if (!userID) return res.status(401).send("Not logged in");
+
+  try {
+    const result = await pool.query(
+      `SELECT day, time FROM "userAvailability" WHERE userid = $1`,
+      [userID]
+    );
+
+    const availability = result.rows;
+
+    // Group hours by day
+    const grouped = {};
+    for (const { day, time } of availability) {
+      grouped[day] = grouped[day] || [];
+      grouped[day].push(time);
+    }
+
+    const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const recommendations = [];
+
+    // Eating times to avoid
+    const eatingBlocks = [
+      [8, 9],    // breakfast
+      [12, 13],  // lunch
+      [18, 19]   // dinner
+    ];
+
+    // Helper: small random offset
+    const randomOffset = () => (Math.random() * 10 - 5) / 60; // ±5–10 min
+
+    // Helper: format float hours to AM/PM
+    const formatTime = (h) => {
+      const totalMinutes = Math.round(h * 60);
+      const hour = Math.floor(totalMinutes / 60);
+      const min = totalMinutes % 60;
+      const period = hour >= 12 ? "PM" : "AM";
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${min.toString().padStart(2, "0")} ${period}`;
+    };
+
+    // Loop through each day
+    for (const [day, hours] of Object.entries(grouped)) {
+      if (!hours.length) continue;
+
+      // Sort and find continuous blocks
+      const sorted = [...hours].sort((a, b) => a - b);
+      const blocks = [];
+      let start = sorted[0], prev = sorted[0];
+      for (let i = 1; i < sorted.length; i++) {
+        if (sorted[i] === prev + 1) prev = sorted[i];
+        else { blocks.push([start, prev]); start = sorted[i]; prev = sorted[i]; }
+      }
+      blocks.push([start, prev]);
+
+      // Score each block
+      const scoredBlocks = blocks.map(([s, e]) => {
+        let score = e - s + 1; // longer = better
+
+        // Penalize overlap with meals
+        for (const [mealStart, mealEnd] of eatingBlocks) {
+          if (!(e < mealStart || s > mealEnd)) score -= 2;
+        }
+
+        // Prefer afternoon naps
+        const mid = (s + e + 1) / 2;
+        if (mid >= 13 && mid <= 17) score += 2; // afternoon bonus
+
+        // Avoid early morning & late night
+        if (mid <= 10) score -= 2;
+        if (mid >= 18) score -= 2;
+
+        return { start: s, end: e, score };
+      });
+
+      // Pick best block
+      scoredBlocks.sort((a, b) => b.score - a.score);
+      const best = scoredBlocks[0];
+
+      // Schedule one nap in the middle with small random offset
+      const mid = (best.start + best.end + 1) / 2;
+      const napStart = mid - 0.25 + randomOffset();
+      const napEnd = mid + 0.25 + randomOffset();
+
+      recommendations.push({
+        day: dayNames[day],
+        time: `${formatTime(napStart)} – ${formatTime(napEnd)}`
+      });
+    }
+
+    res.json(recommendations);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// import { spawn } from "child_process";
+
+// router.get("/recommendations", async (req, res) => {
+//   const userID = req.session.user?.id;
+//   if (!userID) return res.status(401).send("Not logged in");
+
+//   try {
+//     const result = await pool.query(
+//       `SELECT day, time FROM "userAvailability" WHERE userid = $1`,
+//       [userID]
+//     );
+
+//     const availability = result.rows;
+
+//     // Group hours by day
+//     const grouped = {};
+//     for (const { day, time } of availability) {
+//       if (!grouped[day]) grouped[day] = [];
+//       grouped[day].push(time);
+//     }
+
+//     const dayNames = [
+//       "Sunday",
+//       "Monday",
+//       "Tuesday",
+//       "Wednesday",
+//       "Thursday",
+//       "Friday",
+//       "Saturday",
+//     ];
+
+//     const recommendations = [];
+
+//     // Helper to call Python AI
+//     const getNapPrediction = (inputData) =>
+//       new Promise((resolve, reject) => {
+//         const py = spawn("python3", ["./ai/predict.py", JSON.stringify(inputData)]);
+//         let dataString = "";
+
+//         py.stdout.on("data", (data) => {
+//           dataString += data.toString();
+//         });
+
+//         py.stderr.on("data", (data) => {
+//           console.error("Python error:", data.toString());
+//         });
+
+//         py.on("close", () => {
+//           try {
+//             const result = JSON.parse(dataString);
+//             resolve(result);
+//           } catch (err) {
+//             reject(new Error("Invalid JSON output from Python"));
+//           }
+//         });
+//       });
+
+//     // Format hours to AM/PM
+//     const formatTime = (h) => {
+//       const totalMinutes = Math.round(h * 60);
+//       const hour = Math.floor(totalMinutes / 60);
+//       const min = totalMinutes % 60;
+//       const period = hour >= 12 ? "PM" : "AM";
+//       const hour12 = hour % 12 || 12;
+//       return `${hour12}:${min.toString().padStart(2, "0")} ${period}`;
+//     };
+
+//     // Loop through each day
+//     for (const [day, hours] of Object.entries(grouped)) {
+//       if (!hours.length) continue;
+
+//       const sortedHours = [...hours].sort((a, b) => a - b);
+//       const availableStart = sortedHours[0];
+//       const availableEnd = sortedHours[sortedHours.length - 1];
+
+//       // Prepare input for AI
+//       const aiInput = {
+//         dayOfWeek: Number(day),
+//         availableStart,
+//         availableEnd,
+//         sleepHours: 7, // can replace with actual user sleep data
+//       };
+
+//       // Call Python AI model
+//       const prediction = await getNapPrediction(aiInput);
+
+//       console.log(prediction);
+
+//       // Clamp the AI prediction to availability (already handled in Python if you prefer)
+//       const napStart = Math.max(prediction.recommended_nap_start, availableStart);
+//       const napEnd = Math.min(prediction.recommended_nap_end, availableEnd);
+
+//       recommendations.push({
+//         day: dayNames[day],
+//         time: `${formatTime(napStart)} – ${formatTime(napEnd)}`,
+//       });
+//     }
+
+//     res.json(recommendations);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
 
 
 export default router;

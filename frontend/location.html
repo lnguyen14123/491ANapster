@@ -194,5 +194,97 @@
     el.useBtn.addEventListener('click', load);     // initial locate + render
     el.refreshBtn.addEventListener('click', load); // recompute using current settings
   </script>
+
+  <!-- usage: call loadNearbyRecommendations() after the page loads -->
+<script>
+  /**
+   * Suggests nearby nap spots based on walking time.
+   * @param {number} maxWalkMinutes - Only show places <= this many walking minutes (default 10).
+   * @param {number} limit - Max number of places to display (default 3).
+   */
+  async function loadNearbyRecommendations(maxWalkMinutes = 10, limit = 3) {
+    const out = document.getElementById("best-nap-nearby");
+    if (!out) return; // No target container? Quietly exit.
+  
+    // --- Small helpers ---------------------------------------------------------
+  
+    // Degrees → radians
+    function toRad(d){ return d * Math.PI / 180; }
+  
+    // Haversine: distance between two lat/lon points on a sphere (meters).
+    function haversine(lat1, lon1, lat2, lon2){
+      const R = 6371000; // Earth radius in meters
+      const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2
+             + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      return 2 * R * Math.asin(Math.sqrt(a)); // meters
+    }
+  
+    // Convert walking distance (m) to minutes using ~80 m/min (≈4.8 km/h).
+    function minutesFromMeters(m){ const mPerMin = 80; return m / mPerMin; }
+  
+    // ---------------------------------------------------------------------------
+  
+    out.innerHTML = "Finding your location…";
+  
+    // Promise wrapper around the Geolocation API (gets current lat/lon).
+    function getPosition(){
+      return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) return reject(new Error("Geolocation not supported"));
+        navigator.geolocation.getCurrentPosition(
+          pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+          err => reject(err), // user denied / timeout / etc.
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+    }
+  
+    try {
+      // 1) Get user's current position
+      const user = await getPosition();
+  
+      // 2) Load candidate places from local JSON
+      //    Expecting an array like:
+      //    [{ id, name, lat, lon, indoor: boolean, seating: "chair" | "sofa" | ... }, ...]
+      const resp = await fetch("./data/places.json", { cache: "no-cache" });
+      const places = await resp.json();
+  
+      // 3) Compute distance + walking minutes to each place, then filter/sort/limit
+      const ranked = places.map(p => {
+        const distM = haversine(user.lat, user.lon, p.lat, p.lon);
+        const mins = minutesFromMeters(distM);
+        return { ...p, distanceMeters: Math.round(distM), walkMinutes: Math.round(mins) };
+      })
+      .filter(p => p.walkMinutes <= maxWalkMinutes)      // within walking threshold
+      .sort((a,b) => a.walkMinutes - b.walkMinutes)      // closest first
+      .slice(0, limit);                                   // cap the list
+  
+      // 4) Render results or an empty state
+      if (ranked.length === 0) {
+        out.innerHTML = "No nearby nap spots within " + maxWalkMinutes + " minutes.";
+        return;
+      }
+  
+      out.innerHTML = ranked.map(p => `
+        <div class="nap-card">
+          <div class="title">${p.name}</div>
+          <div>${p.walkMinutes} min walk • ${Math.round(p.distanceMeters)} m</div>
+          <div>${p.indoor ? "Indoor" : "Outdoor"} • ${p.seating || "seating"}</div>
+          <button onclick="startNap(${p.id})">Start Nap here</button>
+        </div>
+      `).join("");
+    } catch (e) {
+      // Geolocation blocked, timed out, or fetch error.
+      out.innerHTML = "Location unavailable. Please enable location and refresh.";
+    }
+  }
+  
+  // Minimal stub that you can wire to your existing start-nap flow.
+  // Replace alert with navigation or state changes as needed.
+  function startNap(placeId){
+    alert("Starting nap at place #" + placeId);
+  }
+  </script>
+  
 </body>
 </html>
