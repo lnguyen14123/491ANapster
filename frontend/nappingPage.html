@@ -777,6 +777,11 @@
         startPauseBtn.addEventListener("click", () =>
           state === STATE.IDLE || state === STATE.PAUSED ? start() : pause()
         );
+
+        startPauseBtn.addEventListener("click", () => {
+          localStorage.setItem("alarmStarted", "true");
+        });
+
         resetBtn.addEventListener("click", reset);
         durationInput.addEventListener("change", () => {
           if (state === STATE.IDLE) {
