@@ -2,30 +2,11 @@
 <html lang="en">
   <!--begin::Head-->
   <head>
-    <!--Style for the streak display-->
-    <style>
-      .days { display: grid; grid-template-columns: repeat(14, 1fr); }
-      .no-streak {
-        width: 25px;
-        height: 20px;
-        background-color: white;
-        border: 2px solid black;
-        border-radius: 25px;
-      }
-
-      .yes-streak {
-        width: 25px;
-        height: 20px;
-        background-color: rgb(23, 100, 23);
-        border: 2px solid black;
-        border-radius: 25px;
-      }
-    </style>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Napster | Dashboard </title>
+    <title>Napster | Friends </title>
     <!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="title" content="Napster | Dashboard" />
+    <meta name="title" content="Napster | Nap Schedule" />
     <meta name="author" content="ColorlibHQ" />
     <meta
       name="description"
@@ -70,11 +51,57 @@
       integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
       crossorigin="anonymous"
     />
+    <link rel="icon" type="image/png" href="./dist/assets/img/napster_favicon.png">
+
+    <style>
+      .slot-container {
+          position: relative;
+          height: 150%;
+      }
+
+      .nap {
+          position: absolute;
+          left: 2px;
+          right: 2px;
+          background-color: #8b5cf6;
+          color: #fff;
+          border-radius: 4px;
+          padding: 2px 4px;
+          font-size: 0.8rem;
+      }
+
+      .friend-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+      }
+      .friend-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      .friend-avatar {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+      }
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+      }
+      .status-online { background-color: #28a745; }
+      .status-away { background-color: #ffc107; }
+      .status-offline { background-color: #6c757d; }
+      .friend-actions .btn {
+        margin: 2px;
+      }
+    </style>
+
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
-
       <!--begin::Header-->
       <nav class="app-header navbar navbar-expand bg-body">
         <!--begin::Container-->
@@ -91,34 +118,6 @@
           <!--end::Start Navbar Links-->
           <!--begin::End Navbar Links-->
           <ul class="navbar-nav ms-auto">
-            <!--begin::Notifications Dropdown Menu-->
-            <li class="nav-item dropdown">
-              <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                <i class="bi bi-bell-fill"></i>
-                <span class="navbar-badge badge text-bg-warning">15</span>
-              </a>
-              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <span class="dropdown-item dropdown-header">15 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-envelope me-2"></i> 4 new messages
-                  <span class="float-end text-secondary fs-7">3 mins</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-people-fill me-2"></i> 8 friend requests
-                  <span class="float-end text-secondary fs-7">12 hours</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
-                  <span class="float-end text-secondary fs-7">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
-              </div>
-            </li>
-            <!--end::Notifications Dropdown Menu-->
             <!--begin::Fullscreen Toggle-->
             <li class="nav-item">
               <a class="nav-link" href="#" data-lte-toggle="fullscreen">
@@ -205,11 +204,22 @@
               </li>
 
               <li class="nav-item">
+                <a href="./dashboard.html" class="nav-link">
+                  <i class="nav-icon bi bi-speedometer"></i>
+                  <p>
+                    Dashboard
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="./napHistory.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
                   <p>Nap History</p>
                 </a>
               </li>
+
+              <li class="nav-item"><a href="./autoNapScheduler.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>AI Nap Scheduler</p></a></li>
+
 
               <li class="nav-item">
                 <a href="./napSchedule.html" class="nav-link">
@@ -218,8 +228,14 @@
                 </a>
               </li>
 
-              <li class="nav-item"><a href="./rewards.html" class="nav-link active"><i class=" nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
+              <li class="nav-item"><a href="./userSchedule.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>User Schedule</p></a></li>
 
+
+              <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
+
+              <li class="nav-item"><a href="./location.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Location Recommendation</p></a></li>
+              
+              <li class="nav-item"><a href="./friendsystem.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Friends</p></a></li> 
 
               <li class="nav-item">
                 <a href="./settings.html" class="nav-link">
@@ -292,9 +308,6 @@
         <!--end::Sidebar Wrapper-->
       </aside>
       <!--end::Sidebar-->
-
-
-
       <!--begin::App Main-->
       <main class="app-main">
         <!--begin::App Content Header-->
@@ -303,11 +316,15 @@
           <div class="container-fluid">
             <!--begin::Row-->
             <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Rewards</h3></div>
+              <div class="col-sm-6">
+                <h3 class="mb-0">Friends</h3>
+              </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-end">
                   <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Home</li>
+                  <li class="breadcrumb-item active" aria-current="page">
+                    Friends
+                  </li>
                 </ol>
               </div>
             </div>
@@ -315,76 +332,60 @@
           </div>
           <!--end::Container-->
         </div>
+        <!--end::App Content Header-->
+        <!--begin::App Content-->
         <div class="app-content">
-
-      <!--begin::Footer-->
-      <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
-        <strong>
-          Copyright &copy; 2025&nbsp;
-        </strong>
-        All rights reserved.
-        <!--end::Copyright-->
-      </footer>
-      <!--Displaying the number of consecutive days a user clicks on the alarm button as a streak-->
-      <div class="app-content">
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h1 class="mb-0 brand-heading">Streak</h1>
-                    </div>
-                    <div>Current streak count: 0</div>
-                    <div class="days" id="days">
-                      <div class="no-streak" id="streak-1"></div>
-                      <div class="no-streak" id="streak-2"></div>
-                      <div class="no-streak" id="streak-3"></div>
-                      <div class="no-streak" id="streak-4"></div>
-                      <div class="no-streak" id="streak-5"></div>
-                      <div class="no-streak" id="streak-6"></div>
-                      <div class="no-streak" id="streak-7"></div>
-                      <div class="no-streak" id="streak-8"></div>
-                      <div class="no-streak" id="streak-9"></div>
-                      <div class="no-streak" id="streak-10"></div>
-                      <div class="no-streak" id="streak-11"></div>
-                      <div class="no-streak" id="streak-12"></div>
-                      <div class="no-streak" id="streak-13"></div>
-                      <div class="no-streak" id="streak-14"></div>
-                    </div>
+          <!--begin::Container-->
+          <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row mb-3">
+              <div class="col-12">
+                <div class="input-group">
+                  <input type="text" id="searchFriends" class="form-control" placeholder="Search friends...">
+                  <button class="btn btn-primary" type="button">
+                    <i class="bi bi-search"></i> Search
+                  </button>
+                  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addFriendModal">
+                    <i class="bi bi-person-plus"></i> Add Friend
+                  </button>
                 </div>
+              </div>
             </div>
+
+            <div class="row" id="friendsList">
+              <!-- Friends will be dynamically loaded here -->
+            </div>
+            <!--end::Row-->
+          </div>
+          <!--end::Container-->
         </div>
-      </class>
+        <!--end::App Content-->
+      </main>
+      <!--end::App Main-->
+      <!--begin::Footer-->
       <!--end::Footer-->
     </div>
-    <!--Leaderboard UI to compare user's longest streak with other users and show rankings-->
-    <div class="app-content">
-      <div class="container-fluid">
-        <div class="card">
-          <div class="card-header">
-            <div class="table-responsive">
-              <table class="table align-middle">
-                <h1 class="mb-0 brand-heading">Leaderboard</h1>
-                <thead>
-                  <th>Username</th>
-                  <th>Highest Streak</th>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Username1</td>
-                    <td>10</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+    <!--end::App Wrapper-->
+
+    <!-- Add Friend Modal -->
+    <div class="modal fade" id="addFriendModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Friend</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="text" class="form-control" placeholder="Enter username or email">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary">Send Request</button>
           </div>
         </div>
       </div>
     </div>
-    <!--end::App Wrapper-->
+
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
     <script
@@ -427,43 +428,6 @@
         }
       });
     </script>
-    <script>
-      // Whenever this page is loaded, load the states for the streaks to display streak count
-      function applyStreakStates() {
-        for (let i = 1; i <= localStorage.getItem("streakCount"); i++) {
-          const streakBox = document.getElementById(`streak-${i}`);
-          const savedState = localStorage.getItem(`streak-${i}-state`);
-          if (savedState == "yes-streak") {
-            streakBox.classList.add("yes-streak");
-            streakBox.classList.remove("no-streak");
-          } else if (savedState == "no-streak") {
-            streakBox.classList.add("no-streak");
-            streakBox.classList.remove("yes-streak");
-          }
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", applyStreakStates());
-
-      // Initialize the streak count
-      if (!localStorage.getItem("streakCount")) {
-        localStorage.setItem("streakCount", 0);
-      }
-      // If the alarm has started, increase the streak count by 1 and reflect it by changing the style of the streak box
-      document.addEventListener("DOMContentLoaded", () => {
-        if (localStorage.getItem("alarmStarted") === "true") {
-          localStorage.setItem("streakCount", Number(localStorage.getItem("streakCount")) + 1);
-          const currentStreakBox = document.getElementById(`streak-${Number(localStorage.getItem("streakCount"))}`);
-          currentStreakBox.classList.replace("no-streak", "yes-streak");
-          localStorage.setItem(`streak-${Number(localStorage.getItem("streakCount"))}-state`, "yes-streak");
-
-          console.log(localStorage.getItem("streakCount"));
-
-          localStorage.removeItem("alarmStarted");
-        }
-      })
-    </script>
-
     <!--end::OverlayScrollbars Configure-->
     <!-- OPTIONAL SCRIPTS -->
     <!-- apexcharts -->
@@ -472,13 +436,82 @@
       integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
       crossorigin="anonymous"
     ></script>
+    
+    <!--begin::Friends List Script-->
     <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
+      // Sample friends data
+      const friends = [
+        { id: 1, name: 'Jane Doe', status: 'online', lastNap: '2 hours ago', napStreak: 15, avatar: 'Jane+Doe' },
+        { id: 2, name: 'Burnice White', status: 'away', lastNap: '30 mins ago', napStreak: 8, avatar: 'Burnice+White' },
+        { id: 3, name: 'Bernard Tran', status: 'online', lastNap: '1 hour ago', napStreak: 22, avatar: 'Bernard+Tran' },
+      ];
 
-      
+      function renderFriends(friendsToRender = friends) {
+        const friendsList = document.getElementById('friendsList');
+        friendsList.innerHTML = '';
+
+        friendsToRender.forEach((friend, index) => {
+          const col = document.createElement('div');
+          col.className = 'col-md-6 col-lg-4 mb-4';
+          
+          col.innerHTML = `
+            <div class="card friend-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                  <img src="https://ui-avatars.com/api/?name=${friend.avatar}&background=random&size=80" 
+                       class="rounded-circle friend-avatar me-3" alt="${friend.name}">
+                  <div class="flex-grow-1">
+                    <h5 class="mb-1">${friend.name}</h5>
+                    <small class="text-muted">
+                      <span class="status-indicator status-${friend.status}"></span>
+                      ${friend.status.charAt(0).toUpperCase() + friend.status.slice(1)}
+                    </small>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <p class="mb-1"><i class="bi bi-moon-stars text-primary"></i> Last nap: ${friend.lastNap}</p>
+                  <p class="mb-0"><i class="bi bi-fire text-danger"></i> Nap streak: ${friend.napStreak} days</p>
+                </div>
+                <div class="friend-actions d-flex justify-content-between">
+                  <button class="btn btn-sm btn-primary" onclick="viewProfile(${friend.id})">
+                    <i class="bi bi-person"></i> Profile
+                  </button>
+
+                  <button class="btn btn-sm btn-success" onclick="sendNudge(${friend.id})">
+                    <i class="bi bi-bell"></i> Nudge
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          friendsList.appendChild(col);
+        });
+      }
+
+      function viewProfile(friendId) {
+        const friend = friends.find(f => f.id === friendId);
+        alert(`Viewing profile for ${friend.name}`);
+      }
+
+      function sendNudge(friendId) {
+        const friend = friends.find(f => f.id === friendId);
+        alert(`Nudge sent to ${friend.name}! Time for a nap! 😴`);
+      }
+
+      // Search functionality
+      document.getElementById('searchFriends').addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        const filtered = friends.filter(friend => 
+          friend.name.toLowerCase().includes(searchTerm)
+        );
+        renderFriends(filtered);
+      });
+
+      // Initialize friends list
+      renderFriends();
     </script>
+    <!--end::Friends List Script-->
     <!--end::Script-->
   </body>
   <!--end::Body-->
