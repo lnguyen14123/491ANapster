@@ -329,6 +329,226 @@
         margin-top: 4px;
         min-height: 1.2em;
       }
+
+      /* Chatbot bubble icon */
+      #chatbot-toggle {
+        position: fixed;
+        bottom: 80px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: #d6b3ff;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        z-index: 1000;
+        transition: all 0.3s ease;
+      }
+      /* chat bot icon hoover color */
+      #chatbot-toggle:hover {
+        background-color: #c59aff;
+        transform: scale(1.1);
+      }
+      /* the chatbox */
+      #chatbot-window {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 380px;
+        height: 550px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+      }
+      /* open window */
+      #chatbot-window.open {
+        display: flex;
+      }
+      /* header in the chat box */
+      .chatbot-header {
+        background: linear-gradient(135deg, #d6b3ff 0%, #c59aff 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .chatbot-header h5 {
+        margin: 0;
+        font-weight: 600;
+      }
+      /* To close the chatbox */
+      .chatbot-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+      .chatbot-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      /* sending message and the text bubbles */
+      .chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+      }
+      .message {
+        margin-bottom: 16px;
+        display: flex;
+        gap: 10px;
+      }
+      /* Ai and user icon in text chat */
+      .message.user {
+        flex-direction: row-reverse;
+      }
+      .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 18px;
+      }
+      .message.bot .message-avatar {
+        background: #d6b3ff;
+        color: white;
+      }
+      .message.user .message-avatar {
+        background: #6c757d;
+        color: white;
+      }
+      /* the text bubble */
+      .message-content {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        word-wrap: break-word;
+      }
+
+      .message.bot .message-content {
+        background: white;
+        border-bottom-left-radius: 4px;
+      }
+
+      .message.user .message-content {
+        background: #d6b3ff;
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+      /* AI message critera */
+      .chatbot-input-area {
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .chatbot-input-wrapper {
+        display: flex;
+        gap: 10px;
+      }
+
+      .chatbot-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 24px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .chatbot-input:focus {
+        border-color: #d6b3ff;
+      }
+
+      .chatbot-send {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background-color: #d6b3ff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      .chatbot-send:hover:not(:disabled) {
+        background-color: #c59aff;
+      }
+
+      .chatbot-send:disabled {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+      }
+      /* user typing area */
+      .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 12px 16px;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #6c757d;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      /* allow typing in the chatbot */
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          opacity: 0.3;
+          transform: translateY(0);
+        }
+        30% {
+          opacity: 1;
+          transform: translateY(-10px);
+        }
+      }
+
+      @media (max-width: 480px) {
+        #chatbot-window {
+          width: calc(100vw - 20px);
+          right: 10px;
+          bottom: 90px;
+          height: 500px;
+        }
+      }
     </style>
   </head>
 
@@ -571,6 +791,55 @@
               </div>
               <audio id="napMiniAudio" preload="auto"></audio>
             </section>
+          </div>
+        </div>
+
+        <!-- Chatbot UI -->
+        <button id="chatbot-toggle" aria-label="Open chatbot">
+          <i class="bi bi-chat-dots-fill"></i>
+        </button>
+        <!--header for chat-->
+        <div id="chatbot-window">
+          <div class="chatbot-header">
+            <h5><i class="bi bi-robot me-2"></i>Napster AI Assistant</h5>
+            <button
+              class="chatbot-close"
+              id="chatbot-close"
+              aria-label="Close chatbot"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+          </div>
+          <!--Beginning message-->
+          <div class="chatbot-messages" id="chatbot-messages">
+            <div class="message bot">
+              <div class="message-avatar">
+                <i class="bi bi-robot"></i>
+              </div>
+              <div class="message-content">
+                Hi! I'm your Napster AI assistant. How can I help you with your
+                sleep and nap schedule today?
+              </div>
+            </div>
+          </div>
+          <!--Chatbot message sender-->
+          <div class="chatbot-input-area">
+            <div class="chatbot-input-wrapper">
+              <input
+                type="text"
+                class="chatbot-input"
+                id="chatbot-input"
+                placeholder="Type your message..."
+                autocomplete="off"
+              />
+              <button
+                class="chatbot-send"
+                id="chatbot-send"
+                aria-label="Send message"
+              >
+                <i class="bi bi-send-fill"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -931,6 +1200,244 @@
         // Initial load
         refreshFromStorage();
       })();
+
+      // Chatbot functionality
+      const chatbotToggle = document.getElementById("chatbot-toggle");
+      const chatbotWindow = document.getElementById("chatbot-window");
+      const chatbotClose = document.getElementById("chatbot-close");
+      const chatbotInput = document.getElementById("chatbot-input");
+      const chatbotSend = document.getElementById("chatbot-send");
+      const chatbotMessages = document.getElementById("chatbot-messages");
+
+      // Toggle chatbot window
+      chatbotToggle.addEventListener("click", () => {
+        chatbotWindow.classList.add("open");
+        chatbotInput.focus();
+      });
+
+      chatbotClose.addEventListener("click", () => {
+        chatbotWindow.classList.remove("open");
+      });
+
+      // Add message to chat
+      function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${isUser ? "user" : "bot"}`;
+
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+        avatar.innerHTML = isUser
+          ? '<i class="bi bi-person-fill"></i>'
+          : '<i class="bi bi-robot"></i>';
+
+        const content = document.createElement("div");
+        content.className = "message-content";
+        content.textContent = text;
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(content);
+        chatbotMessages.appendChild(messageDiv);
+
+        // Scroll to bottom
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+      }
+
+      // Show typing indicator
+      function showTypingIndicator() {
+        const typingDiv = document.createElement("div");
+        typingDiv.className = "message bot";
+        typingDiv.id = "typing-indicator";
+
+        const avatar = document.createElement("div");
+        avatar.className = "message-avatar";
+        avatar.innerHTML = '<i class="bi bi-robot"></i>';
+
+        const content = document.createElement("div");
+        content.className = "message-content typing-indicator";
+        content.innerHTML =
+          '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+        typingDiv.appendChild(avatar);
+        typingDiv.appendChild(content);
+        chatbotMessages.appendChild(typingDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+      }
+
+      function removeTypingIndicator() {
+        const indicator = document.getElementById("typing-indicator");
+        if (indicator) {
+          indicator.remove();
+        }
+      }
+
+      // Handle sending messages
+      async function sendMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        chatbotInput.value = "";
+        chatbotSend.disabled = true;
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        setTimeout(() => {
+          removeTypingIndicator();
+
+          addMessage(randomResponse, false);
+          chatbotSend.disabled = false;
+          chatbotInput.focus();
+        }, 1500);
+      }
+      // Smart response generator
+      function generateResponse(userMessage) {
+        const message = userMessage.toLowerCase();
+
+        // Nap duration questions
+        if (
+          message.includes("how long") &&
+          (message.includes("nap") || message.includes("sleep"))
+        ) {
+          return "The ideal nap length depends on your goals: 10-20 minutes for a quick power nap, 60 minutes for memory boost, or 90 minutes for a full sleep cycle. What works best for you?";
+        }
+
+        // Nap timing questions
+        if (
+          (message.includes("when") || message.includes("what time")) &&
+          message.includes("nap")
+        ) {
+          return "The best time to nap is typically between 1-3 PM, when your body naturally experiences an afternoon dip in energy. Avoid napping after 4 PM as it might interfere with nighttime sleep.";
+        }
+
+        // Benefits questions
+        if (
+          message.includes("benefit") ||
+          (message.includes("why") && message.includes("nap"))
+        ) {
+          return "Napping can improve alertness, boost mood, enhance performance, increase creativity, and help with memory consolidation. Even a short 20-minute nap can make a big difference!";
+        }
+
+        // Sleep problems
+        if (
+          message.includes("cant sleep") ||
+          message.includes("can't sleep") ||
+          message.includes("insomnia")
+        ) {
+          return "If you're having trouble sleeping, try: maintaining a consistent sleep schedule, avoiding caffeine 6 hours before bed, keeping your room cool and dark, and limiting screen time before sleep. Would you like more specific tips?";
+        }
+
+        // Alarm/wake up questions
+        if (
+          message.includes("alarm") ||
+          (message.includes("wake") && !message.includes("up"))
+        ) {
+          return "You can set an alarm using the purple Alarm button on the home page! It will help ensure you don't oversleep your nap. Would you like tips on optimal nap durations?";
+        }
+
+        // Schedule questions
+        if (message.includes("schedule") || message.includes("plan")) {
+          return "Check out your Nap Schedule page from the sidebar! You can view and plan your naps there. A consistent schedule helps train your body for better rest.";
+        }
+
+        // History questions
+        if (
+          message.includes("history") ||
+          message.includes("track") ||
+          message.includes("log")
+        ) {
+          return "You can view your nap history in the Nap History page from the sidebar. Tracking your naps helps you understand your sleep patterns better!";
+        }
+
+        // Dashboard questions
+        if (
+          message.includes("dashboard") ||
+          message.includes("stats") ||
+          message.includes("data")
+        ) {
+          return "Visit the Dashboard page to see your sleep statistics and insights! It provides a comprehensive overview of your napping patterns.";
+        }
+
+        // Power nap
+        if (message.includes("power nap")) {
+          return "A power nap is a short 10-20 minute nap that boosts alertness without entering deep sleep. It's perfect for a quick energy boost during the day!";
+        }
+
+        // Greetings
+        if (
+          message.includes("hello") ||
+          message.includes("hi ") ||
+          message === "hi" ||
+          message.includes("hey")
+        ) {
+          return "Hello! How can I help you optimize your naps and sleep today? 😊";
+        }
+
+        // Thanks
+        if (message.includes("thank") || message.includes("thanks")) {
+          return "You're welcome! Let me know if you need any other sleep or nap advice. Sweet dreams! 💤";
+        }
+
+        // Goodbye
+        if (message.includes("bye") || message.includes("goodbye")) {
+          return "Goodbye! Rest well and happy napping! 🌙";
+        }
+
+        // Default responses for unrelated questions
+        const defaultResponses = [
+          "That's an interesting question about sleep! While I'm still learning, I can help you with nap schedules, optimal nap times, and sleep tips. What would you like to know?",
+          "I'm here to help with your napping needs! Try asking me about ideal nap duration, best times to nap, or check your nap history and schedule in the sidebar.",
+          "Good question! I specialize in nap and sleep advice. Would you like to know about power naps, sleep cycles, or how to use the Napster features?",
+          "I can help you with nap-related questions! Try asking about nap benefits, timing, duration, or explore the Dashboard and Nap History pages for insights.",
+        ];
+
+        return defaultResponses[
+          Math.floor(Math.random() * defaultResponses.length)
+        ];
+      }
+
+      // Handle sending messages
+      async function sendMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        chatbotInput.value = "";
+        chatbotSend.disabled = true;
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        // Simulate thinking time
+        const thinkingTime = 800 + Math.random() * 700;
+
+        setTimeout(() => {
+          removeTypingIndicator();
+
+          // Generate response
+          const response = generateResponse(message);
+          addMessage(response, false);
+
+          chatbotSend.disabled = false;
+          chatbotInput.focus();
+        }, thinkingTime);
+      }
+
+      // Event listeners for sending messages
+      chatbotSend.addEventListener("click", sendMessage);
+
+      chatbotInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      // Enable/disable send button based on input
+      chatbotInput.addEventListener("input", () => {
+        chatbotSend.disabled = !chatbotInput.value.trim();
+      });
     </script>
   </body>
 </html>
