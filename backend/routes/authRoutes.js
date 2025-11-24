@@ -1,7 +1,7 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { pool } from "../db.js";
 import { randomUUID } from "crypto"; // built-in in Node.js v14+
 
@@ -111,6 +111,43 @@ router.post("/logout", (req, res) => {
     res.redirect("/signin");
   });
 });
+
+// Serve the forgot password page -- Kate Dinh
+router.get("/forgot-password", (req, res) => {
+  res.sendFile(path.join(__dirname, "../../frontend/forgot-password.html"));
+});
+
+// Handle forgot password form submission
+router.post("/forgot-password", async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  try {
+    // Check if user exists
+    const result = await pool.query(
+      `SELECT userid FROM "User" WHERE email = $1`,
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      // No user with that email
+      return res.redirect("/forgot-password?status=notfound");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await pool.query(
+      `UPDATE "User" SET password_hash = $1 WHERE email = $2`,
+      [hashedPassword, email]
+    );
+
+    // Redirect back to login with a success message
+    res.redirect("/signin?reset=success");
+  } catch (err) {
+    console.error("Error resetting password:", err);
+    res.redirect("/forgot-password?status=error");
+  }
+});
+
 
   
 export default router;

@@ -12,13 +12,13 @@ import appRoutes from "./routes/appRoutes.js";
 import apiRoutes from "./routes/api.js";
 import { Pool } from "pg";
 import dotenv from "dotenv";
+import musicRoutes from "./routes/musicRoutes.js"; // Kate Dinh add for musicApi
 
 
 // Required to simulate __dirname in ES Modules
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 // create the app and set the port
 const app = express();
@@ -29,6 +29,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use("/api/music", musicRoutes); //Kate Dinh create for music API
+app.use("/audio", express.static(path.join(__dirname, "audio"))); // Kate-Serve local audio
+
 
 
 // create session for prototype site
