@@ -60,6 +60,112 @@ router.get("/naphistory", async (req, res) => {
   }
 });
 
+// KATE DINH: Rewards endpoint – compute nap points and streak from "nap" table
+router.get("/rewards", async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+
+  const userID = req.session.user.id;
+
+  try {
+    // 1) Total nap minutes and total naps
+    const napStats = await pool.query(
+      `
+      SELECT
+        COALESCE(SUM(EXTRACT(EPOCH FROM (napend - napstart)) / 60.0), 0) AS total_minutes,
+        COUNT(*) AS total_naps
+      FROM "nap"
+      WHERE userid = $1
+        AND napend IS NOT NULL
+      `,
+      [userID]
+    );
+
+    const totalMinutes = Number(napStats.rows[0].total_minutes || 0);
+    const totalNaps = Number(napStats.rows[0].total_naps || 0);
+
+    // Example points formula: 1 point per minute + 10 bonus per completed nap
+    const napPoints = Math.round(totalMinutes + totalNaps * 10);
+
+    // 2) Build current + longest streak from distinct nap days
+    const streakResult = await pool.query(
+      `
+      SELECT DISTINCT DATE(napend) AS nap_date
+      FROM "nap"
+      WHERE userid = $1
+        AND napend IS NOT NULL
+      ORDER BY nap_date ASC
+      `,
+      [userID]
+    );
+
+    const days = streakResult.rows.map((r) => {
+      const d = new Date(r.nap_date);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    let currentStreak = 0;
+    let longestStreak = 0;
+
+    if (days.length > 0) {
+      // Longest streak (scan from oldest to newest)
+      let streak = 1;
+      for (let i = 1; i < days.length; i++) {
+        const diffDays = Math.round(
+          (days[i].getTime() - days[i - 1].getTime()) / msPerDay
+        );
+        if (diffDays === 1) {
+          streak++;
+        } else if (diffDays > 1) {
+          if (streak > longestStreak) longestStreak = streak;
+          streak = 1;
+        }
+      }
+      if (streak > longestStreak) longestStreak = streak;
+
+      // Current streak (scan backwards from newest)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const latest = days[days.length - 1];
+      const diffFromToday = Math.round(
+        (today.getTime() - latest.getTime()) / msPerDay
+      );
+
+      if (diffFromToday <= 1) {
+        // streak is active (nap today or yesterday)
+        currentStreak = 1;
+        for (let i = days.length - 2; i >= 0; i--) {
+          const diff = Math.round(
+            (days[i + 1].getTime() - days[i].getTime()) / msPerDay
+          );
+          if (diff === 1) {
+            currentStreak++;
+          } else {
+            break;
+          }
+        }
+      } else {
+        currentStreak = 0;
+      }
+    }
+
+    res.json({
+      napPoints,
+      totalMinutes,
+      totalNaps,
+      currentStreak,
+      longestStreak,
+    });
+  } catch (err) {
+    console.error("Error in GET /api/rewards:", err);
+    res.status(500).json({ error: "Failed to fetch rewards" });
+  }
+});
+
 // handle the change username action, updates database to new username
 router.post("/changeusername", async (req, res) => {
   const username = req.body.username.trim();
@@ -425,111 +531,5 @@ router.get("/recommendations", async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
-// import { spawn } from "child_process";
-
-// router.get("/recommendations", async (req, res) => {
-//   const userID = req.session.user?.id;
-//   if (!userID) return res.status(401).send("Not logged in");
-
-//   try {
-//     const result = await pool.query(
-//       `SELECT day, time FROM "userAvailability" WHERE userid = $1`,
-//       [userID]
-//     );
-
-//     const availability = result.rows;
-
-//     // Group hours by day
-//     const grouped = {};
-//     for (const { day, time } of availability) {
-//       if (!grouped[day]) grouped[day] = [];
-//       grouped[day].push(time);
-//     }
-
-//     const dayNames = [
-//       "Sunday",
-//       "Monday",
-//       "Tuesday",
-//       "Wednesday",
-//       "Thursday",
-//       "Friday",
-//       "Saturday",
-//     ];
-
-//     const recommendations = [];
-
-//     // Helper to call Python AI
-//     const getNapPrediction = (inputData) =>
-//       new Promise((resolve, reject) => {
-//         const py = spawn("python3", ["./ai/predict.py", JSON.stringify(inputData)]);
-//         let dataString = "";
-
-//         py.stdout.on("data", (data) => {
-//           dataString += data.toString();
-//         });
-
-//         py.stderr.on("data", (data) => {
-//           console.error("Python error:", data.toString());
-//         });
-
-//         py.on("close", () => {
-//           try {
-//             const result = JSON.parse(dataString);
-//             resolve(result);
-//           } catch (err) {
-//             reject(new Error("Invalid JSON output from Python"));
-//           }
-//         });
-//       });
-
-//     // Format hours to AM/PM
-//     const formatTime = (h) => {
-//       const totalMinutes = Math.round(h * 60);
-//       const hour = Math.floor(totalMinutes / 60);
-//       const min = totalMinutes % 60;
-//       const period = hour >= 12 ? "PM" : "AM";
-//       const hour12 = hour % 12 || 12;
-//       return `${hour12}:${min.toString().padStart(2, "0")} ${period}`;
-//     };
-
-//     // Loop through each day
-//     for (const [day, hours] of Object.entries(grouped)) {
-//       if (!hours.length) continue;
-
-//       const sortedHours = [...hours].sort((a, b) => a - b);
-//       const availableStart = sortedHours[0];
-//       const availableEnd = sortedHours[sortedHours.length - 1];
-
-//       // Prepare input for AI
-//       const aiInput = {
-//         dayOfWeek: Number(day),
-//         availableStart,
-//         availableEnd,
-//         sleepHours: 7, // can replace with actual user sleep data
-//       };
-
-//       // Call Python AI model
-//       const prediction = await getNapPrediction(aiInput);
-
-//       console.log(prediction);
-
-//       // Clamp the AI prediction to availability (already handled in Python if you prefer)
-//       const napStart = Math.max(prediction.recommended_nap_start, availableStart);
-//       const napEnd = Math.min(prediction.recommended_nap_end, availableEnd);
-
-//       recommendations.push({
-//         day: dayNames[day],
-//         time: `${formatTime(napStart)} – ${formatTime(napEnd)}`,
-//       });
-//     }
-
-//     res.json(recommendations);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ success: false, error: err.message });
-//   }
-// });
-
 
 export default router;
