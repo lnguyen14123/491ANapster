@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Napster | Sleep Music</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ---- Base theme ---- */
+    :root { --violet:#8b5cf6; }
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+
+    /* ---- Header ---- */
+    .brand { display:flex; align-items:center; gap:.6rem; margin-bottom:1rem; }
+    .brand img { height:40px; width:auto; }
+    .brand h1 { color: var(--violet); margin:0; font-size:1.6rem; }
+
+    /* ---- Utilities ---- */
+    .row { margin: .75rem 0; display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+    input, button, select { font-size: 1rem; padding: .5rem; }
+    button { cursor: pointer; }
+    a { color: var(--violet); text-decoration: none; }
+    .btn { border:1px solid #ddd; border-radius:999px; background:#fafafa; padding:.45rem .8rem; }
+    .primary { background:var(--violet); color:#fff; border-color:transparent; }
+    .card { border:1px solid #eee; border-radius:12px; padding:12px; }
+    .status { margin-top: .25rem; color: #555; min-height:1.2em; }
+
+    /* ---- Source tabs ---- */
+    .tabs { display:flex; gap:.5rem; }
+    .tab { padding:.45rem .8rem; border:1px solid #ddd; border-radius:999px; background:#fff; cursor:pointer; }
+    .tab.active { background:var(--violet); color:#fff; border-color:transparent; }
+
+    /* ---- Deezer results ---- */
+    #results { list-style: none; padding: 0; margin-top: .75rem; }
+    #results li {
+      display:grid; grid-template-columns:56px 1fr auto; gap:.75rem; align-items:center;
+      padding:.5rem; border:1px solid #eee; border-radius:.75rem; margin-bottom:.5rem;
+    }
+    #results img { width:56px; height:56px; object-fit:cover; border-radius:.5rem; }
+    .meta { display:flex; flex-direction:column; min-width:0; }
+    .title { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .artist { color:#666; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* ---- Misc ---- */
+    .pill { border:1px solid #ddd; border-radius:999px; padding:.25rem .6rem; font-size:.9rem; background:#f9f9f9; }
+    .inline { display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; }
+    .stack { display:flex; flex-direction:column; gap:.5rem; }
+    .muted { color:#666; font-size:.95rem; }
+    .divider { height:1px; background:#eee; margin:.75rem 0; }
+  </style>
+</head>
+<body>
+  <!-- Header with logo and page title -->
+  <div class="brand">
+    <img src="/dist/assets/img/napsterlogo_image.png" alt="Napster logo">
+    <h1>Sleep Music</h1>
+  </div>
+
+  <!-- Primary actions + live status text -->
+  <div class="inline">
+    <button class="btn primary" id="useSelected" disabled>Use this track</button>
+    <a class="btn" id="backHome" href="./nappingPage.html">Back to Home</a>
+    <span class="status" id="status">Choose a source, find a track, then click “Use this track”.</span>
+  </div>
+
+  <!-- Main content: tabs + panes (Deezer, Local) -->
+  <section class="card">
+    <!-- Tabs for switching sources -->
+    <div class="tabs">
+      <button class="tab active" id="tabDeezer" data-src="deezer">Deezer</button>
+      <button class="tab" id="tabLocal" data-src="local">Local (MP3)</button>
+    </div>
+
+    <!-- Deezer pane: search UI, results list, audio preview controls -->
+    <div id="paneDeezer" class="stack">
+      <div class="row">
+        <input id="dzQuery" placeholder="Try: rain, ocean, piano, meditation" />
+        <button id="dzSearch" class="btn">Search</button>
+        <select id="dzSort">
+          <option value="RANKING">Relevance</option>
+          <option value="TRACK_ASC">Title A–Z</option>
+          <option value="ARTIST_ASC">Artist A–Z</option>
+          <option value="ALBUM_ASC">Album A–Z</option>
+          <option value="RATING_DESC">Top Rated</option>
+          <option value="DURATION_DESC">Longest</option>
+        </select>
+      </div>
+      <ul id="results"></ul>
+      <audio id="dzPlayer" controls preload="auto" style="width:100%; max-width:720px;"></audio>
+      <div class="inline">
+        <label><input type="checkbox" id="dzLoop"> Loop preview</label>
+        <label>Volume <input type="range" id="dzVol" min="0" max="1" step="0.01" value="1" style="width:160px"></label>
+      </div>
+    </div>
+
+    <!-- Local MP3 pane: direct URL test + local library list -->
+    <div id="paneLocal" class="stack" style="display:none;">
+      <div class="muted">Paste a direct link to an audio file (mp3/ogg/wav). Host must allow cross-origin audio (CORS).</div>
+      <div class="row">
+        <input id="localUrl" placeholder="/audio/brahms-lullaby.mp3" style="flex:1;" />
+        <button id="localTest" class="btn">Test Play</button>
+        <button id="localStop" class="btn">Stop</button>
+      </div>
+      <audio id="localPlayer" controls preload="auto" style="width:100%; max-width:720px;"></audio>
+      <div class="inline">
+        <label><input type="checkbox" id="localLoop"> Loop</label>
+        <label>Volume <input type="range" id="localVol" min="0" max="1" step="0.01" value="1" style="width:160px"></label>
+      </div>
+
+      <!-- Auto-filled from /api/music/audio -->
+      <div class="divider"></div>
+      <div class="stack">
+        <strong>My Library</strong>
+        <ul id="localList" style="list-style:none; padding:0; margin:0;"></ul>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /* ===============================
+       LocalStorage keys for settings
+       =============================== */
+    const K = {
+      preview: "nap.music.previewUrl", // chosen audio URL
+      title:   "nap.music.title",      // chosen track title
+      artist:  "nap.music.artist",     // chosen artist
+      img:     "nap.music.img",        // chosen cover art
+      source:  "nap.settings.source",  // remembered source: 'deezer' | 'local'
+      defq:    "nap.settings.defaultQuery", // default Deezer query term
+      loop:    "nap.settings.loop"     // default loop on/off for players
+    };
+
+    // ---- Utility helpers ----
+    const statusEl = document.getElementById("status");
+    function setStatus(t){ statusEl.textContent = t; } // show transient messages to user
+    const getBool = (k, def) => (localStorage.getItem(k) ?? String(!!def)) === "true";
+    const getStr  = (k, def) => localStorage.getItem(k) ?? def;
+
+    // Determine where to go after selecting a track (supports ?return=/path)
+    function getReturnUrl(){
+      const u = new URL(window.location.href);
+      return u.searchParams.get("return") || "/nappingPage.html";
+    }
+
+    // Format seconds as m:ss (used for preview label)
+    function formatSeconds(s){
+      s = Number(s||0);
+      const m = Math.floor(s/60), r = s % 60;
+      return `${m}:${String(r).padStart(2,"0")}`;
+    }
+
+    // Create a readable title from a file URL (/audio/foo-bar.mp3 -> "foo bar")
+    function baseNameFromUrl(u){
+      try{
+        const p = new URL(u, location.href).pathname;
+        const name = p.split("/").pop() || "Audio";
+        return decodeURIComponent(name).replace(/\.[a-z0-9]+$/i,"").replace(/[-_]+/g," ");
+      }catch{ return "Audio"; }
+    }
+
+    /* ===============================
+       Tabs / Source switching
+       =============================== */
+    const tabButtons = {
+      deezer: document.getElementById("tabDeezer"),
+      local:  document.getElementById("tabLocal"),
+    };
+    const panes = {
+      deezer: document.getElementById("paneDeezer"),
+      local:  document.getElementById("paneLocal"),
+    };
+    let currentSource = "deezer"; // default on first load
+
+    // Activate a tab + show corresponding pane
+    function switchSource(src){
+      currentSource = src;
+      Object.values(tabButtons).forEach(b => b.classList.remove("active"));
+      tabButtons[src].classList.add("active");
+      Object.values(panes).forEach(p => p.style.display = "none");
+      panes[src].style.display = "";
+      setStatus(" ");
+
+      // When switching to Local, seed a default and fetch the library
+      if (src === "local") {
+        if (!localUrl.value.trim()) localUrl.value = "/audio/brahms-lullaby.mp3";
+        loadLocalLibrary();
+      }
+    }
+    tabButtons.deezer.onclick = () => switchSource("deezer");
+    tabButtons.local.onclick  = () => switchSource("local");
+
+    /* ===============================
+       Selection model
+       Keeps the currently chosen track
+       =============================== */
+    // Structure: { source, preview, title, artist, img }
+    let selected = null;
+
+    // Update the status line + button enable/disable based on selection
+    function updateCurrentSelectionText(){
+      const el = document.getElementById("status");
+      if (!selected) {
+        // If nothing selected now, show last remembered choice (if any)
+        const t = getStr(K.title, "");
+        const a = getStr(K.artist, "");
+        const text = t ? `Remembered: ${a ? a + " • " : ""}${t}` : "Choose a source, find a track, then click “Use this track”.";
+        el.textContent = text;
+        document.getElementById("useSelected").disabled = !t;
+        return;
+      }
+      // Show live selection
+      el.textContent = `Selected: ${selected.artist ? selected.artist + " • " : ""}${selected.title}`;
+      document.getElementById("useSelected").disabled = false;
+    }
+
+    // Persist chosen track to localStorage and navigate back to caller
+    function persistSelectionAndReturn(sel){
+      localStorage.setItem(K.source,  currentSource);
+      localStorage.setItem(K.preview, sel.preview || "");
+      localStorage.setItem(K.title,   sel.title   || "");
+      localStorage.setItem(K.artist,  sel.artist  || "");
+      localStorage.setItem(K.img,     sel.img     || "");
+      window.location.href = getReturnUrl();
+    }
+
+    // Click: “Use this track”
+    document.getElementById("useSelected").onclick = () => {
+      // If something is selected (Deezer or Local), save and return
+      if (selected) { persistSelectionAndReturn(selected); return; }
+
+      // If on Local and user just pasted a URL, allow direct save without pressing “Select”
+      if (currentSource === "local") {
+        const url = localUrl.value.trim();
+        if (!url){ setStatus("Paste a local MP3 URL first."); return; }
+        persistSelectionAndReturn({
+          source:"local",
+          preview: url,
+          title: baseNameFromUrl(url),
+          artist: "Local",
+          img: ""
+        });
+        return;
+      }
+
+      setStatus("Pick something first (Preview/Select).");
+    };
+
+    /* ===============================
+       Deezer: search + preview + select
+       =============================== */
+    const dzQuery   = document.getElementById("dzQuery");
+    const dzSort    = document.getElementById("dzSort");
+    const dzSearch  = document.getElementById("dzSearch");
+    const dzResults = document.getElementById("results");
+    const dzPlayer  = document.getElementById("dzPlayer");
+    const dzLoop    = document.getElementById("dzLoop");
+    const dzVol     = document.getElementById("dzVol");
+
+    // Deezer requires JSONP for client-side calls. This helper injects a <script> with a callback.
+    function deezerJsonp(url){
+      return new Promise((resolve, reject) => {
+        const cbName = "dz_cb_" + Math.random().toString(36).slice(2);
+        const s = document.createElement("script");
+        s.src = url + (url.includes("?") ? "&" : "?") + "output=jsonp&callback=" + cbName;
+        window[cbName] = (data) => { resolve(data); cleanup(); };
+        s.onerror = () => { reject(new Error("Network error")); cleanup(); };
+        function cleanup(){ delete window[cbName]; s.remove(); }
+        document.body.appendChild(s);
+      });
+    }
+
+    // Query Deezer and render results; supports order by relevance/alpha/etc.
+    async function searchDeezer(q, order="RANKING"){
+      setStatus("Searching Deezer...");
+      try{
+        const api = `https://api.deezer.com/search?q=${encodeURIComponent(q)}&order=${encodeURIComponent(order)}`;
+        const data = await deezerJsonp(api);
+        renderDeezerResults(data?.data || []);
+        setStatus(`Found ${data?.data?.length || 0} results. Click Preview or Select.`);
+      }catch(e){
+        console.error(e);
+        setStatus("Search failed. Check your connection.");
+      }
+    }
+
+    // Build result list items (cover, meta, Preview, Select buttons)
+    function renderDeezerResults(items){
+      dzResults.innerHTML = "";
+      if(!items.length){
+        dzResults.innerHTML = "<li>No results. Try another term (ocean, piano, white noise).</li>";
+        return;
+      }
+      for(const t of items){
+        const li = document.createElement("li");
+
+        const img = document.createElement("img");
+        img.src = t.album?.cover_medium || t.album?.cover || "";
+        img.alt = t.album?.title || "cover";
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = t.title || "Untitled";
+        const artist = document.createElement("div");
+        artist.className = "artist";
+        artist.textContent = t.artist?.name ? `${t.artist.name} • ${t.album?.title || "Album"}` : (t.album?.title || "");
+
+        const actions = document.createElement("div");
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "pill";
+        prevBtn.textContent = `Preview ${formatSeconds(30)}`;
+        prevBtn.onclick = async () => {
+          if(!t.preview){ setStatus("No preview available for this track."); return; }
+          dzPlayer.src = t.preview;
+          dzPlayer.loop = dzLoop.checked;
+          try { await dzPlayer.play(); setStatus(`Playing: ${t.artist?.name || ""} ${t.title || ""}`); }
+          catch { setStatus("Click Play in the player if autoplay is blocked."); }
+        };
+
+        const selBtn = document.createElement("button");
+        selBtn.className = "pill";
+        selBtn.textContent = "Select";
+        selBtn.onclick = () => {
+          selected = {
+            source: "deezer",
+            preview: t.preview || "",
+            title: t.title || "Untitled",
+            artist: t.artist?.name || "",
+            img: t.album?.cover_medium || t.album?.cover || ""
+          };
+          updateCurrentSelectionText();
+          setStatus("Selected (Deezer). Click “Use this track” to save.");
+        };
+
+        actions.appendChild(prevBtn);
+        actions.appendChild(selBtn);
+
+        meta.appendChild(title);
+        meta.appendChild(artist);
+        li.appendChild(img);
+        li.appendChild(meta);
+        li.appendChild(actions);
+        dzResults.appendChild(li);
+      }
+    }
+
+    // Wire up Deezer controls
+    dzSearch.onclick  = () => { const q = dzQuery.value.trim(); if (!q){ setStatus("Enter a search term."); return; } searchDeezer(q, dzSort.value); };
+    dzSort.onchange   = () => { const q = dzQuery.value.trim(); if (q) searchDeezer(q, dzSort.value); };
+    dzLoop.onchange   = () => { dzPlayer.loop = dzLoop.checked; };
+    dzVol.oninput     = () => { dzPlayer.volume = Number(dzVol.value); };
+
+    /* ===============================
+       Local MP3: paste URL + library
+       =============================== */
+    const localUrl   = document.getElementById("localUrl");
+    const localTest  = document.getElementById("localTest");
+    const localStop  = document.getElementById("localStop");
+    const localPlayer= document.getElementById("localPlayer");
+    const localLoop  = document.getElementById("localLoop");
+    const localVol   = document.getElementById("localVol");
+    const localList  = document.getElementById("localList");
+
+    // Mirror loop + volume controls to the <audio> element
+    localLoop.onchange = ()=> { localPlayer.loop = localLoop.checked; };
+    localVol.oninput   = ()=> { localPlayer.volume = Number(localVol.value); };
+
+    // Try playing the pasted URL; also sets the selection model
+    localTest.onclick = async ()=> {
+      const u = localUrl.value.trim();
+      if (!u){ setStatus("Paste a direct audio URL."); return; }
+      localPlayer.src = u;
+      try { await localPlayer.play(); setStatus("Playing local URL…"); }
+      catch { setStatus("If blocked, press Play in the player. Also check CORS on the host."); }
+      selected = { source:"local", preview: u, title: baseNameFromUrl(u), artist: "Local", img: "" };
+      updateCurrentSelectionText();
+    };
+
+    // Stop local playback and reset time
+    localStop.onclick = ()=> { localPlayer.pause(); localPlayer.currentTime = 0; };
+
+    // Render items from /api/music/audio as a simple list with Preview/Select
+    function renderLocalLibrary(items){
+      localList.innerHTML = "";
+      if (!items.length){
+        localList.innerHTML = `<li class="muted">No audio files found in /backend/audio.</li>`;
+        return;
+      }
+      for (const it of items){
+        const li = document.createElement("li");
+        li.style.display = "grid";
+        li.style.gridTemplateColumns = "1fr auto";
+        li.style.gap = ".5rem";
+        li.style.alignItems = "center";
+        li.style.border = "1px solid #eee";
+        li.style.borderRadius = ".75rem";
+        li.style.padding = ".5rem";
+        li.style.marginBottom = ".5rem";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = it.title || baseNameFromUrl(it.url);
+
+        const actions = document.createElement("div");
+        actions.style.display = "flex";
+        actions.style.gap = ".5rem";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "pill";
+        prevBtn.textContent = "Preview";
+        prevBtn.onclick = async () => {
+          localPlayer.src = it.url;
+          try { await localPlayer.play(); setStatus(`Playing: ${it.title}`); }
+          catch { setStatus("Press Play in the player if autoplay is blocked."); }
+          localUrl.value = it.url; // also fill input for quick “Use this track”
+        };
+
+        const selBtn = document.createElement("button");
+        selBtn.className = "pill";
+        selBtn.textContent = "Select";
+        selBtn.onclick = () => {
+          selected = { source: "local", preview: it.url, title: it.title, artist: "Local", img: "" };
+          localUrl.value = it.url;
+          updateCurrentSelectionText();
+          setStatus("Selected (Local). Click “Use this track” to save.");
+        };
+
+        actions.appendChild(prevBtn);
+        actions.appendChild(selBtn);
+        li.appendChild(title);
+        li.appendChild(actions);
+        localList.appendChild(li);
+      }
+    }
+
+    // Fetch the local library list from server; falls back to empty list on error
+    async function loadLocalLibrary(){
+      try{
+        const res = await fetch("/api/music/audio");
+        if (!res.ok) throw new Error("bad status");
+        const items = await res.json();
+        renderLocalLibrary(items);
+      }catch(e){
+        renderLocalLibrary([]);
+      }
+    }
+
+    /* ===============================
+       Init on load
+       =============================== */
+    // Ensure “Back to Home” respects ?return=
+    document.getElementById("backHome").href = getReturnUrl();
+
+    // Apply default loop preference to both players (remembered via localStorage)
+    function applyLoopDefaultsToPlayers(){
+      const loopDefault = getBool(K.loop, true); // default to ON if never set
+      document.getElementById("dzLoop").checked = loopDefault; dzPlayer.loop = loopDefault;
+      document.getElementById("localLoop").checked = loopDefault; localPlayer.loop = loopDefault;
+    }
+
+    // Main entrypoint: restore source, seed Deezer/local defaults, update status line
+    (function init(){
+      const src = getStr(K.source, "deezer");
+      switchSource(src);                 // Will also load local library if needed
+      applyLoopDefaultsToPlayers();
+
+      if (src === "deezer"){
+        const q = getStr(K.defq, "rain"); // Use stored default query or “rain”
+        dzQuery.value = q;
+        searchDeezer(q, "RANKING");
+      } else if (src === "local"){
+        // If nothing saved yet, prefill with a friendly example path
+        if (!localStorage.getItem(K.preview)) document.getElementById("localUrl").value = "/audio/brahms-lullaby.mp3";
+      }
+
+      updateCurrentSelectionText();
+    })();
+  </script>
+</body>
+</html>

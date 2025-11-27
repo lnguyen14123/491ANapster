@@ -1,145 +1,369 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <!--begin::Head-->
   <head>
-    <!--Style for the streak display-->
-    <style>
-      .days { display: grid; grid-template-columns: repeat(14, 1fr); }
-      .no-streak {
-        width: 25px;
-        height: 20px;
-        background-color: white;
-        border: 2px solid black;
-        border-radius: 25px;
-      }
+    <meta charset="utf-8" />
+    <title>Napster | Rewards</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      .yes-streak {
-        width: 25px;
-        height: 20px;
-        background-color: rgb(23, 100, 23);
-        border: 2px solid black;
-        border-radius: 25px;
-      }
-    </style>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Napster | Dashboard </title>
-    <!--begin::Primary Meta Tags-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="title" content="Napster | Dashboard" />
-    <meta name="author" content="ColorlibHQ" />
-    <meta
-      name="description"
-      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS."
-    />
-    <meta
-      name="keywords"
-      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard"
-    />
-    <!--end::Primary Meta Tags-->
-    <!--begin::Fonts-->
+    <!-- Fonts / Icons / AdminLTE  -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
-      integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
-      crossorigin="anonymous"
     />
-    <!--end::Fonts-->
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css"
-      integrity="sha256-tZHrRjVqNSRyWg2wbppGnT833E/Ys0DHWGwT04GiqQg="
-      crossorigin="anonymous"
-    />
-    <!--end::Third Party Plugin(OverlayScrollbars)-->
-    <!--begin::Third Party Plugin(Bootstrap Icons)-->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-      integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI="
-      crossorigin="anonymous"
     />
-    <!--end::Third Party Plugin(Bootstrap Icons)-->
-    <!--begin::Required Plugin(AdminLTE)-->
-    <link rel="stylesheet" href="./dist/css/adminlte.css" />
-    <!--end::Required Plugin(AdminLTE)-->
-    <!-- apexcharts -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.css"
-      integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
-      crossorigin="anonymous"
+      href="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/styles/overlaysscrollbars.min.css"
     />
-  </head>
-  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
-    <!--begin::App Wrapper-->
-    <div class="app-wrapper">
+    <link rel="stylesheet" href="./dist/css/adminlte.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="./dist/assets/img/napsterlogo.png"
+    />
 
-      <!--begin::Header-->
+    <style>
+      :root {
+        /* Light purple theme  */
+        --violet: #8b5cf6;
+        --violet-600: #7c3aed;
+        --violet-400: #a78bfa;
+        --violet-300: #c4b5fd;
+        --violet-100: #ede9fe;
+
+        --ink: #0f172a;
+        --muted: #6b7280;
+        --glass: rgba(255, 255, 255, 0.6);
+        --ring-bg: #ffffff;
+      }
+
+      /* Background + blobs */
+      .app-main {
+        background: radial-gradient(
+            1200px 600px at 10% -10%,
+            rgba(139, 92, 246, 0.15),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 500px at 110% 20%,
+            rgba(196, 181, 253, 0.22),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+        min-height: 100vh;
+      }
+      .ambient {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(40px);
+        opacity: 0.4;
+        animation: float 18s ease-in-out infinite;
+      }
+      .blob.violet {
+        width: 360px;
+        height: 360px;
+        background: #c4b5fd;
+        left: 10%;
+        top: 20%;
+      }
+      .blob.sky {
+        width: 420px;
+        height: 420px;
+        background: #ede9fe;
+        right: 8%;
+        bottom: 10%;
+        animation-delay: -6s;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) translateX(0);
+        }
+        50% {
+          transform: translateY(-20px) translateX(10px);
+        }
+      }
+
+      /* Center layout (glass card) */
+      .center-wrap {
+        position: relative;
+        z-index: 2;
+        min-height: calc(100vh - 112px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2.5rem 1rem;
+      }
+
+      .glass {
+        width: min(1020px, 95vw);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        background: var(--glass);
+        backdrop-filter: blur(10px) saturate(1.1);
+        border: 1px solid rgba(139, 92, 246, 0.18);
+        box-shadow: 0 20px 60px rgba(2, 6, 23, 0.08);
+        border-radius: 24px;
+        padding: 24px;
+      }
+
+      /* Summary row: Nap Points / Current Streak / Next Reward */
+      .summary-row {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+      @media (max-width: 900px) {
+        .summary-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .summary-card {
+        background: #ffffffd8;
+        border-radius: 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .summary-icon {
+        font-size: 1.6rem;
+        margin-top: 2px;
+      }
+
+      .summary-body {
+        flex: 1;
+      }
+
+      .summary-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #6b7280;
+        margin-bottom: 2px;
+      }
+
+      .summary-value {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #312e81;
+        line-height: 1.1;
+      }
+
+      .summary-sub {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-top: 2px;
+      }
+
+      .progress {
+        background-color: #e5e7eb;
+      }
+
+      /* Streak & Leaderboard cards */
+      .detail-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 900px) {
+        .detail-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card-rewards {
+        background: #ffffffc9;
+        border-radius: 18px;
+        padding: 18px 20px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+      }
+
+      .card-rewards h4 {
+        margin: 0;
+        font-weight: 800;
+        color: #312e81;
+      }
+
+      .card-rewards p {
+        margin-bottom: 0.4rem;
+        color: var(--muted);
+      }
+
+      /* Streak track styling */
+      .streak-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 0.4rem;
+      }
+
+      .streak-header span {
+        font-size: 0.9rem;
+      }
+
+      .streak-count-pill {
+        border-radius: 999px;
+        padding: 3px 10px;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .streak-track {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 30px;
+        background: rgba(244, 223, 252, 0.8);
+      }
+
+      .days {
+        display: grid;
+        grid-template-columns: repeat(14, 1fr);
+        gap: 4px;
+      }
+
+      .no-streak,
+      .yes-streak {
+        width: 22px;
+        height: 18px;
+        border-radius: 999px;
+        border: 2px solid #c7d2fe;
+      }
+
+      .no-streak {
+        background-color: #ffffff;
+      }
+
+      .yes-streak {
+        background-color: #4ade80;
+        border-color: #22c55e;
+      }
+
+      .streak-legend {
+        font-size: 0.8rem;
+        color: #6b4b5c;
+        margin-top: 0.4rem;
+      }
+
+      @keyframes streakPop {
+        0% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .streak-pop {
+        animation: streakPop 0.4s ease-out;
+      }
+
+      /* Leaderboard table */
+      .leader-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .leader-table th,
+      .leader-table td {
+        padding: 0.55rem 0.4rem;
+      }
+      .leader-table thead th {
+        border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+        color: #4b5563;
+        font-weight: 600;
+      }
+      .leader-table tbody tr:nth-child(even) {
+        background: #f9fafb;
+      }
+      .leader-table tbody tr.highlight {
+        background: #fef9c3;
+      }
+
+      .badge-reward {
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+
+      footer.app-footer {
+        position: relative;
+        z-index: 2;
+        background: transparent;
+        border-top: none;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+
+  <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+      <!-- Header -->
       <nav class="app-header navbar navbar-expand bg-body">
-        <!--begin::Container-->
         <div class="container-fluid">
-          <!--begin::Start Navbar Links-->
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+              <a
+                class="nav-link"
+                data-lte-toggle="sidebar"
+                href="#"
+                role="button"
+              >
                 <i class="bi bi-list"></i>
               </a>
             </li>
-            <li class="nav-item d-none d-md-block"><a href="./nappingPage.html" class="nav-link">Home</a></li>
-          </ul>
-          <!--end::Start Navbar Links-->
-          <!--begin::End Navbar Links-->
-          <ul class="navbar-nav ms-auto">
-            <!--begin::Notifications Dropdown Menu-->
-            <li class="nav-item dropdown">
-              <a class="nav-link" data-bs-toggle="dropdown" href="#">
-                <i class="bi bi-bell-fill"></i>
-                <span class="navbar-badge badge text-bg-warning">15</span>
-              </a>
-              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <span class="dropdown-item dropdown-header">15 Notifications</span>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-envelope me-2"></i> 4 new messages
-                  <span class="float-end text-secondary fs-7">3 mins</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-people-fill me-2"></i> 8 friend requests
-                  <span class="float-end text-secondary fs-7">12 hours</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item">
-                  <i class="bi bi-file-earmark-fill me-2"></i> 3 new reports
-                  <span class="float-end text-secondary fs-7">2 days</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
-              </div>
+            <li class="nav-item d-none d-md-block">
+              <a href="./nappingPage.html" class="nav-link">Home</a>
             </li>
-            <!--end::Notifications Dropdown Menu-->
-            <!--begin::Fullscreen Toggle-->
+          </ul>
+          <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <a class="nav-link" href="#" data-lte-toggle="fullscreen">
                 <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
+                <i
+                  data-lte-icon="minimize"
+                  class="bi bi-fullscreen-exit"
+                  style="display: none"
+                ></i>
               </a>
             </li>
-            <!--end::Fullscreen Toggle-->
-            <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown user-menu">
-              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+              <a
+                href="#"
+                class="nav-link dropdown-toggle"
+                data-bs-toggle="dropdown"
+              >
                 <img
                   src="/dist/assets/img/user2-160x160.jpg"
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
                 <span class="username-display d-none d-md-inline"></span>
-                
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <!--begin::User Image-->
                 <li class="user-header text-bg-primary">
                   <img
                     src="/dist/assets/img/user2-160x160.jpg"
@@ -148,67 +372,68 @@
                   />
                   <p class="username-display"></p>
                   <small>Member since Nov. 2023</small>
-
                 </li>
-                <!--end::User Image-->
-                <!--begin::Menu Footer-->
                 <li class="user-footer">
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a id="logout-btn" href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  <a
+                    id="logout-btn"
+                    href="#"
+                    class="btn btn-default btn-flat float-end"
+                    >Sign out</a
+                  >
                 </li>
-                <!--end::Menu Footer-->
               </ul>
             </li>
-            <!--end::User Menu Dropdown-->
           </ul>
-          <!--end::End Navbar Links-->
         </div>
-        <!--end::Container-->
       </nav>
-      <!--end::Header-->
-      <!--begin::Sidebar-->
+
+      <!-- Sidebar  -->
       <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-        <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
-          <!--begin::Brand Link-->
           <a href="./nappingPage.html" class="brand-link">
-            <!--begin::Brand Image-->
             <img
               src="/dist/assets/img/napsterlogo_image.png"
-              alt="AdminLTE Logo"
               class="brand-image opacity-75 shadow"
+              alt="Logo"
             />
-            <!--end::Brand Image-->
-            <!--begin::Brand Text-->
             <span class="brand-text fw-light">Napster</span>
-            <!--end::Brand Text-->
           </a>
-          <!--end::Brand Link-->
         </div>
-        <!--end::Sidebar Brand-->
-        <!--begin::Sidebar Wrapper-->
         <div class="sidebar-wrapper">
           <nav class="mt-2">
-            <!--begin::Sidebar Menu-->
             <ul
               class="nav sidebar-menu flex-column"
               data-lte-toggle="treeview"
               role="menu"
               data-accordion="false"
             >
-
               <li class="nav-item">
-                <a href="./nappingPage.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Home</p>
-                </a>
+                <a href="./nappingPage.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Home</p></a
+                >
               </li>
 
               <li class="nav-item">
-                <a href="./napHistory.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Nap History</p>
-                </a>
+                <a href="./dashboard.html" class="nav-link"
+                  ><i class="nav-icon bi bi-speedometer"></i>
+                  <p>Dashboard</p></a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a href="./napHistory.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Nap History</p></a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a href="./autoNapScheduler.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>AI Nap Scheduler</p></a
+                >
               </li>
 
               <li class="nav-item">
@@ -218,268 +443,408 @@
                 </a>
               </li>
 
-              <li class="nav-item"><a href="./rewards.html" class="nav-link active"><i class=" nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
-
+              <li class="nav-item">
+                <a href="./userSchedule.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>User Schedule</p></a
+                >
+              </li>
 
               <li class="nav-item">
-                <a href="./settings.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Settings</p>
-                </a>
+                <a href="./rewards.html" class="nav-link active"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Rewards</p></a
+                >
               </li>
 
+              <li class="nav-item">
+                <a href="./location.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Location Recommendation</p></a
+                >
+              </li>
 
+              <li class="nav-item">
+                <a href="./friends.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Friends System</p></a
+                >
+              </li>
 
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 1
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="./examples/login.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="./examples/register.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 2
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="./examples/login-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="./examples/register-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="./examples/lockscreen.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Lockscreen</p>
-                    </a>
-                  </li>
-                </ul>
+              <li class="nav-item">
+                <a href="./settings.html" class="nav-link"
+                  ><i class="nav-icon bi bi-moon-stars"></i>
+                  <p>Settings</p></a
+                >
               </li>
             </ul>
-            <!--end::Sidebar Menu-->
           </nav>
         </div>
-        <!--end::Sidebar Wrapper-->
       </aside>
-      <!--end::Sidebar-->
 
-
-
-      <!--begin::App Main-->
+      <!-- Main -->
       <main class="app-main">
-        <!--begin::App Content Header-->
-        <div class="app-content-header">
-          <!--begin::Container-->
-          <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-              <div class="col-sm-6"><h3 class="mb-0">Rewards</h3></div>
-              <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                  <li class="breadcrumb-item"><a href="#">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">Home</li>
-                </ol>
+        <!-- ambient background blobs -->
+        <div class="ambient" aria-hidden="true">
+          <div class="blob violet"></div>
+          <div class="blob sky"></div>
+        </div>
+
+        <div class="center-wrap">
+          <div class="glass">
+            <!-- Summary strip -->
+            <div class="summary-row">
+              <!-- Nap Points -->
+              <div class="summary-card">
+                <div class="summary-icon">
+                  <i class="bi bi-stars"></i>
+                </div>
+                <div class="summary-body">
+                  <div class="summary-label">Nap Points</div>
+                  <div class="summary-value" id="nap-points">0</div>
+                  <div class="summary-sub">
+                    Earn points for every quality nap you complete.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Current Streak -->
+              <div class="summary-card">
+                <div class="summary-icon">
+                  <i class="bi bi-calendar-heart"></i>
+                </div>
+                <div class="summary-body">
+                  <div class="summary-label">Current Streak</div>
+                  <div class="summary-value">
+                    <span id="summary-streak">0</span> days
+                  </div>
+                  <div class="summary-sub">
+                    Log naps daily to keep your streak alive.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Next Reward -->
+              <div class="summary-card">
+                <div class="summary-icon">
+                  <i class="bi bi-gift"></i>
+                </div>
+                <div class="summary-body">
+                  <div class="summary-label">Next Reward</div>
+                  <div class="summary-sub" style="font-weight: 600">
+                    “Power Nap Pro” badge at 10-day streak
+                  </div>
+                  <div class="summary-sub" style="margin-top: 4px">
+                    Progress: <span id="streak-progress-label">0</span>/10 days
+                  </div>
+                  <div class="mt-1">
+                    <div class="progress" style="height: 6px">
+                      <div
+                        id="streak-progress-bar"
+                        class="progress-bar"
+                        role="progressbar"
+                        style="
+                          width: 0%;
+                          background: linear-gradient(90deg, #f2ccfa, #d4ecfb);
+                        "
+                        aria-valuenow="0"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <!--end::Row-->
-          </div>
-          <!--end::Container-->
-        </div>
-        <div class="app-content">
 
-      <!--begin::Footer-->
-      <footer class="app-footer">
-        <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
-        <!--end::To the end-->
-        <!--begin::Copyright-->
-        <strong>
-          Copyright &copy; 2025&nbsp;
-        </strong>
-        All rights reserved.
-        <!--end::Copyright-->
-      </footer>
-      <!--Displaying the number of consecutive days a user clicks on the alarm button as a streak-->
-      <div class="app-content">
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h1 class="mb-0 brand-heading">Streak</h1>
-                    </div>
-                    <div>Current streak count: 0</div>
-                    <div class="days" id="days">
-                      <div class="no-streak" id="streak-1"></div>
-                      <div class="no-streak" id="streak-2"></div>
-                      <div class="no-streak" id="streak-3"></div>
-                      <div class="no-streak" id="streak-4"></div>
-                      <div class="no-streak" id="streak-5"></div>
-                      <div class="no-streak" id="streak-6"></div>
-                      <div class="no-streak" id="streak-7"></div>
-                      <div class="no-streak" id="streak-8"></div>
-                      <div class="no-streak" id="streak-9"></div>
-                      <div class="no-streak" id="streak-10"></div>
-                      <div class="no-streak" id="streak-11"></div>
-                      <div class="no-streak" id="streak-12"></div>
-                      <div class="no-streak" id="streak-13"></div>
-                      <div class="no-streak" id="streak-14"></div>
-                    </div>
+            <!-- Streak + Leaderboard -->
+            <div class="detail-row">
+              <!-- LEFT: Streak rewards -->
+              <section class="card-rewards" aria-label="Streak rewards">
+                <div class="streak-header">
+                  <h4>Streak</h4>
+                  <span class="streak-count-pill">
+                    Current streak:
+                    <span id="current-streak-count">0</span> days
+                  </span>
                 </div>
-            </div>
-        </div>
-      </class>
-      <!--end::Footer-->
-    </div>
-    <!--Leaderboard UI to compare user's longest streak with other users and show rankings-->
-    <div class="app-content">
-      <div class="container-fluid">
-        <div class="card">
-          <div class="card-header">
-            <div class="table-responsive">
-              <table class="table align-middle">
-                <h1 class="mb-0 brand-heading">Leaderboard</h1>
-                <thead>
-                  <th>Username</th>
-                  <th>Highest Streak</th>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Username1</td>
-                    <td>10</td>
-                  </tr>
-                </tbody>
-              </table>
+                <p>
+                  Keep logging naps to grow your streak and unlock new badges.
+                </p>
+
+                <div class="streak-track">
+                  <div
+                    class="d-flex justify-content-between align-items-center mb-1"
+                  >
+                    <span style="font-size: 0.9rem; font-weight: 600"
+                      >14-day streak track</span
+                    >
+                    <span class="streak-legend">
+                      <i
+                        class="bi bi-circle-fill"
+                        style="color: #22c55e; font-size: 0.6rem"
+                      ></i>
+                      completed day
+                    </span>
+                  </div>
+                  <div class="days" id="days">
+                    <div class="no-streak" id="streak-1"></div>
+                    <div class="no-streak" id="streak-2"></div>
+                    <div class="no-streak" id="streak-3"></div>
+                    <div class="no-streak" id="streak-4"></div>
+                    <div class="no-streak" id="streak-5"></div>
+                    <div class="no-streak" id="streak-6"></div>
+                    <div class="no-streak" id="streak-7"></div>
+                    <div class="no-streak" id="streak-8"></div>
+                    <div class="no-streak" id="streak-9"></div>
+                    <div class="no-streak" id="streak-10"></div>
+                    <div class="no-streak" id="streak-11"></div>
+                    <div class="no-streak" id="streak-12"></div>
+                    <div class="no-streak" id="streak-13"></div>
+                    <div class="no-streak" id="streak-14"></div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 1rem">
+                  <h6
+                    style="
+                      margin-bottom: 0.4rem;
+                      font-weight: 700;
+                      color: #4b5563;
+                    "
+                  >
+                    Badges
+                  </h6>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span class="badge-reward">
+                      <i class="bi bi-cloud-moon-fill me-1"></i>First Nap Logged
+                    </span>
+                    <span class="badge-reward">
+                      <i class="bi bi-star-fill me-1"></i>3-Day Streak
+                    </span>
+                    <span
+                      class="badge-reward"
+                      style="opacity: 0.5; background: #e5e7eb; color: #6b7280"
+                    >
+                      <i class="bi bi-lock-fill me-1"></i>7-Day Streak
+                    </span>
+                    <span
+                      class="badge-reward"
+                      style="opacity: 0.5; background: #e5e7eb; color: #6b7280"
+                    >
+                      <i class="bi bi-lock-fill me-1"></i>14-Day Streak
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- RIGHT: Leaderboard -->
+              <section class="card-rewards" aria-label="Leaderboard">
+                <h4>Leaderboard</h4>
+                <p>
+                  See how your longest streak compares with other Napster
+                  nappers.
+                </p>
+
+                <div class="table-responsive mt-2">
+                  <table class="leader-table">
+                    <thead>
+                      <tr>
+                        <th>Rank</th>
+                        <th>Username</th>
+                        <th>Highest Streak</th>
+                      </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                      <tr class="highlight">
+                        <td>
+                          <i class="bi bi-trophy-fill text-warning"></i> #1
+                        </td>
+                        <td>You</td>
+                        <td>12</td>
+                      </tr>
+                      <tr>
+                        <td>#2</td>
+                        <td>NapMaster99</td>
+                        <td>11</td>
+                      </tr>
+                      <tr>
+                        <td>#3</td>
+                        <td>SleepySam</td>
+                        <td>10</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <p class="mt-3" style="font-size: 0.85rem; color: #6b7280">
+                  Earn consistent streaks to climb the leaderboard. Top nappers
+                  each month can unlock special themes and bonus badges.
+                </p>
+              </section>
             </div>
           </div>
         </div>
-      </div>
+
+        <footer class="app-footer">
+          <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
+          <strong>Copyright &copy; 2025&nbsp;</strong> All rights reserved.
+        </footer>
+      </main>
     </div>
-    <!--end::App Wrapper-->
-    <!--begin::Script-->
-    <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    <script
-      src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
-      integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
-      crossorigin="anonymous"
-    ></script>
-    <!--end::Third Party Plugin(OverlayScrollbars)--><!--begin::Required Plugin(popperjs for Bootstrap 5)-->
-    <script
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-      crossorigin="anonymous"
-    ></script>
-    <!--end::Required Plugin(popperjs for Bootstrap 5)--><!--begin::Required Plugin(Bootstrap 5)-->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-      integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-      crossorigin="anonymous"
-    ></script>
-    <!--end::Required Plugin(Bootstrap 5)--><!--begin::Required Plugin(AdminLTE)-->
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/browser/overlaysscrollbars.browser.es6.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="../../dist/js/adminlte.js"></script>
-    <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
+
     <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
-      const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
-        scrollbarClickScroll: true,
-      };
-      document.addEventListener('DOMContentLoaded', function () {
-        const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== 'undefined') {
+      // Sidebar scrollbars
+      document.addEventListener("DOMContentLoaded", () => {
+        const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+        if (
+          sidebarWrapper &&
+          typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+        ) {
           OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
             scrollbars: {
-              theme: Default.scrollbarTheme,
-              autoHide: Default.scrollbarAutoHide,
-              clickScroll: Default.scrollbarClickScroll,
+              theme: "os-theme-light",
+              autoHide: "leave",
+              clickScroll: true,
             },
           });
         }
       });
+
+      // Auth display
+      fetch("/api/user")
+        .then((res) => {
+          if (res.status === 401) {
+            location.href = "/signin";
+            return null;
+          }
+          return res.json();
+        })
+        .then(
+          (d) =>
+            d?.username &&
+            document
+              .querySelectorAll(".username-display")
+              .forEach((el) => (el.textContent = d.username))
+        )
+        .catch(() => {});
+      document.getElementById("logout-btn")?.addEventListener("click", () => {
+        fetch("/logout", { method: "POST" }).then(
+          () => (location.href = "/signin")
+        );
+      });
     </script>
+
+    <!-- KATE DINH: Streak + summary logic – uses backend /api/rewards but keeps localStorage fallback -->
     <script>
-      // Whenever this page is loaded, load the states for the streaks to display streak count
+      // UPDATED: accepts napPoints from backend instead of computing it here
+      function updateSummaryFromStreak(streakCount, napPoints) {
+        const summaryStreakEl = document.getElementById("summary-streak");
+        const progressLabel = document.getElementById("streak-progress-label");
+        const progressBar = document.getElementById("streak-progress-bar");
+        const napPointsEl = document.getElementById("nap-points");
+
+        if (summaryStreakEl) {
+          summaryStreakEl.textContent = streakCount;
+        }
+        if (napPointsEl && napPoints != null) {
+          napPointsEl.textContent = Number(napPoints).toLocaleString();
+        }
+        if (progressLabel) {
+          const capped = Math.min(streakCount, 10);
+          progressLabel.textContent = capped;
+        }
+        if (progressBar) {
+          const percent = Math.min((streakCount / 10) * 100, 100);
+          progressBar.style.width = percent + "%";
+          progressBar.setAttribute("aria-valuenow", percent.toFixed(0));
+        }
+      }
+
+      //colors boxes from localStorage (client-side streak)
       function applyStreakStates() {
-        for (let i = 1; i <= localStorage.getItem("streakCount"); i++) {
-          const streakBox = document.getElementById(`streak-${i}`);
+        const streakCount = Number(localStorage.getItem("streakCount") || 0);
+        const countLabel = document.getElementById("current-streak-count");
+        if (countLabel) countLabel.textContent = streakCount;
+
+        for (let i = 1; i <= streakCount; i++) {
+          const box = document.getElementById(`streak-${i}`);
           const savedState = localStorage.getItem(`streak-${i}-state`);
-          if (savedState == "yes-streak") {
-            streakBox.classList.add("yes-streak");
-            streakBox.classList.remove("no-streak");
-          } else if (savedState == "no-streak") {
-            streakBox.classList.add("no-streak");
-            streakBox.classList.remove("yes-streak");
+          if (!box) continue;
+          if (savedState === "yes-streak") {
+            box.classList.add("yes-streak");
+            box.classList.remove("no-streak");
+          } else {
+            box.classList.add("no-streak");
+            box.classList.remove("yes-streak");
           }
         }
       }
 
-      document.addEventListener("DOMContentLoaded", applyStreakStates());
-
-      // Initialize the streak count
+      // Initialize streakCount if missing
       if (!localStorage.getItem("streakCount")) {
         localStorage.setItem("streakCount", 0);
       }
-      // If the alarm has started, increase the streak count by 1 and reflect it by changing the style of the streak box
+
       document.addEventListener("DOMContentLoaded", () => {
+        // If alarmStarted flag set from nappingPage, increment streak once
         if (localStorage.getItem("alarmStarted") === "true") {
-          localStorage.setItem("streakCount", Number(localStorage.getItem("streakCount")) + 1);
-          const currentStreakBox = document.getElementById(`streak-${Number(localStorage.getItem("streakCount"))}`);
-          currentStreakBox.classList.replace("no-streak", "yes-streak");
-          localStorage.setItem(`streak-${Number(localStorage.getItem("streakCount"))}-state`, "yes-streak");
-
-          console.log(localStorage.getItem("streakCount"));
-
+          const current = Number(localStorage.getItem("streakCount") || 0) + 1;
+          localStorage.setItem("streakCount", current);
+          const box = document.getElementById(`streak-${current}`);
+          if (box) {
+            box.classList.replace("no-streak", "yes-streak");
+            box.classList.add("streak-pop");
+          }
+          localStorage.setItem(`streak-${current}-state`, "yes-streak");
           localStorage.removeItem("alarmStarted");
         }
-      })
-    </script>
 
-    <!--end::OverlayScrollbars Configure-->
-    <!-- OPTIONAL SCRIPTS -->
-    <!-- apexcharts -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/apexcharts@3.37.1/dist/apexcharts.min.js"
-      integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
-      crossorigin="anonymous"
-    ></script>
-    <script>
-      // NOTICE!! DO NOT USE ANY OF THIS JAVASCRIPT
-      // IT'S ALL JUST JUNK FOR DEMO
-      // ++++++++++++++++++++++++++++++++++++++++++
+        // Keep old localStorage behavior for visual continuity
+        applyStreakStates();
 
-      
+        // KATE DINH: override summary + streak with real data from Neon via /api/rewards
+        fetch("/api/rewards")
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to fetch rewards");
+            return res.json();
+          })
+          .then((data) => {
+            const streak = Number(data.currentStreak || 0);
+            const points = Number(data.napPoints || 0);
+
+            // Update summary strip (Nap Points + Current Streak + progress)
+            updateSummaryFromStreak(streak, points);
+
+            // Update main "Current streak" label
+            const countLabel = document.getElementById("current-streak-count");
+            if (countLabel) countLabel.textContent = streak;
+
+            // Recolor streak boxes purely from DB streak (server as source of truth)
+            for (let i = 1; i <= 14; i++) {
+              const box = document.getElementById(`streak-${i}`);
+              if (!box) continue;
+              box.classList.remove("yes-streak");
+              box.classList.add("no-streak");
+            }
+            for (let i = 1; i <= Math.min(streak, 14); i++) {
+              const box = document.getElementById(`streak-${i}`);
+              if (!box) continue;
+              box.classList.remove("no-streak");
+              box.classList.add("yes-streak");
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to load rewards:", err);
+            // If this fails, UI still shows localStorage-based streak.
+          });
+      });
     </script>
-    <!--end::Script-->
   </body>
-  <!--end::Body-->
 </html>

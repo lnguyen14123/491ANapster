@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Library Quiet Zone",
+    "lat": 33.7837,
+    "lon": -118.1140,
+    "indoor": true,
+    "seating": "sofa",
+    "hasAC": true,
+    "shade": false,
+    "noise": "very-quiet"
+  },
+  {
+    "id": 2,
+    "name": "Student Lounge",
+    "lat": 33.7824,
+    "lon": -118.1125,
+    "indoor": true,
+    "seating": "couch",
+    "hasAC": true,
+    "shade": false,
+    "noise": "medium"
+  },
+  {
+    "id": 3,
+    "name": "Shaded Lawn",
+    "lat": 33.7812,
+    "lon": -118.1110,
+    "indoor": false,
+    "seating": "grass",
+    "hasAC": false,
+    "shade": true,
+    "noise": "quiet"
+  },
+  {
+    "id": 4,
+    "name": "Café Corner",
+    "lat": 33.7845,
+    "lon": -118.1152,
+    "indoor": true,
+    "seating": "chair",
+    "hasAC": true,
+    "shade": false,
+    "noise": "medium"
+  }
+]
