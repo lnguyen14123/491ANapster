@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Napster | Friends </title>
+    <title>Napster | Friends</title>
     <!--begin::Primary Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="title" content="Napster | Nap Schedule" />
@@ -51,23 +51,27 @@
       integrity="sha256-4MX+61mt9NVvvuPjUWdUdyfZfxSB1/Rf9WtqRHgG5S0="
       crossorigin="anonymous"
     />
-    <link rel="icon" type="image/png" href="./dist/assets/img/napster_favicon.png">
+    <link
+      rel="icon"
+      type="image/png"
+      href="./dist/assets/img/napster_favicon.png"
+    />
 
     <style>
       .slot-container {
-          position: relative;
-          height: 150%;
+        position: relative;
+        height: 150%;
       }
 
       .nap {
-          position: absolute;
-          left: 2px;
-          right: 2px;
-          background-color: #8b5cf6;
-          color: #fff;
-          border-radius: 4px;
-          padding: 2px 4px;
-          font-size: 0.8rem;
+        position: absolute;
+        left: 2px;
+        right: 2px;
+        background-color: #8b5cf6;
+        color: #fff;
+        border-radius: 4px;
+        padding: 2px 4px;
+        font-size: 0.8rem;
       }
 
       .friend-card {
@@ -76,7 +80,7 @@
       }
       .friend-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       }
       .friend-avatar {
         width: 80px;
@@ -90,223 +94,35 @@
         display: inline-block;
         margin-right: 5px;
       }
-      .status-online { background-color: #28a745; }
-      .status-away { background-color: #ffc107; }
-      .status-offline { background-color: #6c757d; }
+      .status-online {
+        background-color: #28a745;
+      }
+      .status-away {
+        background-color: #ffc107;
+      }
+      .status-offline {
+        background-color: #6c757d;
+      }
       .friend-actions .btn {
         margin: 2px;
       }
     </style>
-
   </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
-      <!--begin::Header-->
-      <nav class="app-header navbar navbar-expand bg-body">
-        <!--begin::Container-->
-        <div class="container-fluid">
-          <!--begin::Start Navbar Links-->
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
-                <i class="bi bi-list"></i>
-              </a>
-            </li>
-            <li class="nav-item d-none d-md-block"><a href="./nappingPage.html" class="nav-link">Home</a></li>
-          </ul>
-          <!--end::Start Navbar Links-->
-          <!--begin::End Navbar Links-->
-          <ul class="navbar-nav ms-auto">
-            <!--begin::Fullscreen Toggle-->
-            <li class="nav-item">
-              <a class="nav-link" href="#" data-lte-toggle="fullscreen">
-                <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
-                <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display: none"></i>
-              </a>
-            </li>
-            <!--end::Fullscreen Toggle-->
-            <!--begin::User Menu Dropdown-->
-            <li class="nav-item dropdown user-menu">
-              <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                <img
-                  src="/dist/assets/img/user2-160x160.jpg"
-                  class="user-image rounded-circle shadow"
-                  alt="User Image"
-                />
-                <span class="username-display d-none d-md-inline"></span>
-                
-              </a>
-              <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-                <!--begin::User Image-->
-                <li class="user-header text-bg-primary">
-                  <img
-                    src="/dist/assets/img/user2-160x160.jpg"
-                    class="rounded-circle shadow"
-                    alt="User Image"
-                  />
-                  <p class="username-display"></p>
-                  <small>Member since Nov. 2023</small>
-
-                </li>
-                <!--end::User Image-->
-                <!--begin::Menu Footer-->
-                <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a id="logout-btn" href="#" class="btn btn-default btn-flat float-end">Sign out</a>
-                </li>
-                <!--end::Menu Footer-->
-              </ul>
-            </li>
-            <!--end::User Menu Dropdown-->
-          </ul>
-          <!--end::End Navbar Links-->
-        </div>
-        <!--end::Container-->
+      <nav id="nav-placeholder" class="app-header navbar navbar-expand bg-body">
+        <!-- Empty -->
       </nav>
-      <!--end::Header-->
-      <!--begin::Sidebar-->
-      <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-        <!--begin::Sidebar Brand-->
-        <div class="sidebar-brand">
-          <!--begin::Brand Link-->
-          <a href="./nappingPage.html" class="brand-link">
-            <!--begin::Brand Image-->
-            <img
-              src="/dist/assets/img/napsterlogo_image.png"
-              alt="AdminLTE Logo"
-              class="brand-image opacity-75 shadow"
-            />
-            <!--end::Brand Image-->
-            <!--begin::Brand Text-->
-            <span class="brand-text fw-light">Napster</span>
-            <!--end::Brand Text-->
-          </a>
-          <!--end::Brand Link-->
-        </div>
-        <!--end::Sidebar Brand-->
-        <!--begin::Sidebar Wrapper-->
-        <div class="sidebar-wrapper">
-          <nav class="mt-2">
-            <!--begin::Sidebar Menu-->
-            <ul
-              class="nav sidebar-menu flex-column"
-              data-lte-toggle="treeview"
-              role="menu"
-              data-accordion="false"
-            >
 
-              <li class="nav-item">
-                <a href="./nappingPage.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Home</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="./dashboard.html" class="nav-link">
-                  <i class="nav-icon bi bi-speedometer"></i>
-                  <p>
-                    Dashboard
-                  </p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="./napHistory.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Nap History</p>
-                </a>
-              </li>
-
-              <li class="nav-item"><a href="./autoNapScheduler.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>AI Nap Scheduler</p></a></li>
-
-
-              <li class="nav-item">
-                <a href="./napSchedule.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Nap Schedule</p>
-                </a>
-              </li>
-
-              <li class="nav-item"><a href="./userSchedule.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>User Schedule</p></a></li>
-
-
-              <li class="nav-item"><a href="./rewards.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Rewards</p></a></li>
-
-              <li class="nav-item"><a href="./location.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Location Recommendation</p></a></li>
-              
-              <li class="nav-item"><a href="./friendsystem.html" class="nav-link"><i class="nav-icon bi bi-moon-stars"></i><p>Friends</p></a></li> 
-
-              <li class="nav-item">
-                <a href="./settings.html" class="nav-link">
-                  <i class="nav-icon bi bi-moon-stars"></i>
-                  <p>Settings</p>
-                </a>
-              </li>
-
-
-
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 1
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="./examples/login.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="./examples/register.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">
-                      <i class="nav-icon bi bi-box-arrow-in-right"></i>
-                      <p>
-                        Version 2
-                        <i class="nav-arrow bi bi-chevron-right"></i>
-                      </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                      <li class="nav-item">
-                        <a href="./examples/login-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Login</p>
-                        </a>
-                      </li>
-                      <li class="nav-item">
-                        <a href="./examples/register-v2.html" class="nav-link">
-                          <i class="nav-icon bi bi-circle"></i>
-                          <p>Register</p>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a href="./examples/lockscreen.html" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Lockscreen</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-            <!--end::Sidebar Menu-->
-          </nav>
-        </div>
-        <!--end::Sidebar Wrapper-->
+      <aside
+        id="sidebar-placeholder"
+        class="app-sidebar bg-body-secondary shadow"
+        data-bs-theme="dark"
+      >
+        <!-- Empty -->
       </aside>
+
       <!--end::Sidebar-->
       <!--begin::App Main-->
       <main class="app-main">
@@ -341,11 +157,21 @@
             <div class="row mb-3">
               <div class="col-12">
                 <div class="input-group">
-                  <input type="text" id="searchFriends" class="form-control" placeholder="Search friends...">
+                  <input
+                    type="text"
+                    id="searchFriends"
+                    class="form-control"
+                    placeholder="Search friends..."
+                  />
                   <button class="btn btn-primary" type="button">
                     <i class="bi bi-search"></i> Search
                   </button>
-                  <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#addFriendModal">
+                  <button
+                    class="btn btn-success"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addFriendModal"
+                  >
                     <i class="bi bi-person-plus"></i> Add Friend
                   </button>
                 </div>
@@ -373,13 +199,27 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Add New Friend</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <input type="text" class="form-control" placeholder="Enter username or email">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter username or email"
+            />
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
             <button type="button" class="btn btn-primary">Send Request</button>
           </div>
         </div>
@@ -388,6 +228,9 @@
 
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    <script defer src="/dist/js/headerCommon.js"></script>
+    <script defer src="/dist/js/layoutLoader.js"></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
       integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
@@ -409,15 +252,18 @@
     <script src="../../dist/js/adminlte.js"></script>
     <!--end::Required Plugin(AdminLTE)--><!--begin::OverlayScrollbars Configure-->
     <script>
-      const SELECTOR_SIDEBAR_WRAPPER = '.sidebar-wrapper';
+      const SELECTOR_SIDEBAR_WRAPPER = ".sidebar-wrapper";
       const Default = {
-        scrollbarTheme: 'os-theme-light',
-        scrollbarAutoHide: 'leave',
+        scrollbarTheme: "os-theme-light",
+        scrollbarAutoHide: "leave",
         scrollbarClickScroll: true,
       };
-      document.addEventListener('DOMContentLoaded', function () {
+      document.addEventListener("DOMContentLoaded", function () {
         const sidebarWrapper = document.querySelector(SELECTOR_SIDEBAR_WRAPPER);
-        if (sidebarWrapper && typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== 'undefined') {
+        if (
+          sidebarWrapper &&
+          typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+        ) {
           OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
             scrollbars: {
               theme: Default.scrollbarTheme,
@@ -436,77 +282,117 @@
       integrity="sha256-+vh8GkaU7C9/wbSLIcwq82tQ2wTf44aOHA8HlBMwRI8="
       crossorigin="anonymous"
     ></script>
-    
+
     <!--begin::Friends List Script-->
     <script>
       // Sample friends data
       const friends = [
-        { id: 1, name: 'Jane Doe', status: 'online', lastNap: '2 hours ago', napStreak: 15, avatar: 'Jane+Doe' },
-        { id: 2, name: 'Burnice White', status: 'away', lastNap: '30 mins ago', napStreak: 8, avatar: 'Burnice+White' },
-        { id: 3, name: 'Bernard Tran', status: 'online', lastNap: '1 hour ago', napStreak: 22, avatar: 'Bernard+Tran' },
+        {
+          id: 1,
+          name: "Jane Doe",
+          status: "online",
+          lastNap: "2 hours ago",
+          napStreak: 15,
+          avatar: "Jane+Doe",
+        },
+        {
+          id: 2,
+          name: "Burnice White",
+          status: "away",
+          lastNap: "30 mins ago",
+          napStreak: 8,
+          avatar: "Burnice+White",
+        },
+        {
+          id: 3,
+          name: "Bernard Tran",
+          status: "online",
+          lastNap: "1 hour ago",
+          napStreak: 22,
+          avatar: "Bernard+Tran",
+        },
       ];
 
       function renderFriends(friendsToRender = friends) {
-        const friendsList = document.getElementById('friendsList');
-        friendsList.innerHTML = '';
+        const friendsList = document.getElementById("friendsList");
+        friendsList.innerHTML = "";
 
         friendsToRender.forEach((friend, index) => {
-          const col = document.createElement('div');
-          col.className = 'col-md-6 col-lg-4 mb-4';
-          
+          const col = document.createElement("div");
+          col.className = "col-md-6 col-lg-4 mb-4";
+
           col.innerHTML = `
             <div class="card friend-card">
               <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                  <img src="https://ui-avatars.com/api/?name=${friend.avatar}&background=random&size=80" 
-                       class="rounded-circle friend-avatar me-3" alt="${friend.name}">
+                  <img src="https://ui-avatars.com/api/?name=${
+                    friend.avatar
+                  }&background=random&size=80" 
+                       class="rounded-circle friend-avatar me-3" alt="${
+                         friend.name
+                       }">
                   <div class="flex-grow-1">
                     <h5 class="mb-1">${friend.name}</h5>
                     <small class="text-muted">
-                      <span class="status-indicator status-${friend.status}"></span>
-                      ${friend.status.charAt(0).toUpperCase() + friend.status.slice(1)}
+                      <span class="status-indicator status-${
+                        friend.status
+                      }"></span>
+                      ${
+                        friend.status.charAt(0).toUpperCase() +
+                        friend.status.slice(1)
+                      }
                     </small>
                   </div>
                 </div>
                 <div class="mb-3">
-                  <p class="mb-1"><i class="bi bi-moon-stars text-primary"></i> Last nap: ${friend.lastNap}</p>
-                  <p class="mb-0"><i class="bi bi-fire text-danger"></i> Nap streak: ${friend.napStreak} days</p>
+                  <p class="mb-1"><i class="bi bi-moon-stars text-primary"></i> Last nap: ${
+                    friend.lastNap
+                  }</p>
+                  <p class="mb-0"><i class="bi bi-fire text-danger"></i> Nap streak: ${
+                    friend.napStreak
+                  } days</p>
                 </div>
                 <div class="friend-actions d-flex justify-content-between">
-                  <button class="btn btn-sm btn-primary" onclick="viewProfile(${friend.id})">
+                  <button class="btn btn-sm btn-primary" onclick="viewProfile(${
+                    friend.id
+                  })">
                     <i class="bi bi-person"></i> Profile
                   </button>
 
-                  <button class="btn btn-sm btn-success" onclick="sendNudge(${friend.id})">
+                  <button class="btn btn-sm btn-success" onclick="sendNudge(${
+                    friend.id
+                  })">
                     <i class="bi bi-bell"></i> Nudge
                   </button>
                 </div>
               </div>
             </div>
           `;
-          
+
           friendsList.appendChild(col);
         });
       }
 
       function viewProfile(friendId) {
-        const friend = friends.find(f => f.id === friendId);
+        const friend = friends.find((f) => f.id === friendId);
         alert(`Viewing profile for ${friend.name}`);
       }
 
       function sendNudge(friendId) {
-        const friend = friends.find(f => f.id === friendId);
+        const friend = friends.find((f) => f.id === friendId);
         alert(`Nudge sent to ${friend.name}! Time for a nap! 😴`);
       }
 
       // Search functionality
-      document.getElementById('searchFriends').addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const filtered = friends.filter(friend => 
-          friend.name.toLowerCase().includes(searchTerm)
-        );
-        renderFriends(filtered);
-      });
+      document
+        .getElementById("searchFriends")
+        .addEventListener("input", (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          const filtered = friends.filter((friend) =>
+            friend.name.toLowerCase().includes(searchTerm)
+          );
+          renderFriends(filtered);
+        });
 
       // Initialize friends list
       renderFriends();

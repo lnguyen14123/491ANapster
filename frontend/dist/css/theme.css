@@ -1,0 +1,70 @@
+:root {
+  /* Violet theme */
+  --violet: #8b5cf6;
+  --violet-600: #7c3aed;
+  --violet-400: #a78bfa;
+  --violet-300: #c4b5fd;
+  --violet-100: #ede9fe;
+
+  --ink: #0f172a;
+  --muted: #6b7280;
+  --glass: rgba(255, 255, 255, 0.6);
+  --ring-bg: #ffffff;
+}
+
+/* Background canvas */
+.app-main {
+  background: radial-gradient(
+      1200px 600px at 10% -10%,
+      rgba(139, 92, 246, 0.15),
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 500px at 110% 20%,
+      rgba(196, 181, 253, 0.22),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  min-height: 100vh;
+}
+
+/* Violet ambient blobs */
+.ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  opacity: 0.4;
+  animation: float 18s ease-in-out infinite;
+}
+.blob.violet {
+  width: 360px;
+  height: 360px;
+  background: #c4b5fd;
+  left: 10%;
+  top: 20%;
+}
+.blob.sky {
+  width: 420px;
+  height: 420px;
+  background: #ede9fe;
+  right: 8%;
+  bottom: 10%;
+  animation-delay: -6s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(-20px) translateX(10px); }
+}
+
+/* Violet user-header */
+.user-header-violet {
+  background-color: var(--violet-400) !important;
+  color: #fff !important;
+}
