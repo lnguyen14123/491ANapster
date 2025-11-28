@@ -277,14 +277,15 @@
           
           </div>
 
-              <!--Asks users to set the amount of time they want to take naps for-->
+    <!--Asks users to set the amount of time they want to take naps for-->
     <div class="app-content mt-10 pt-10" style="margin-top: 30px">
       <div class="container-fluid">
         <div class="card">
           <div class="card-header">
             <h1 class="mb-0 brand-heading">Nap duration</h1>
             <p class="text-muted small mb-2 mt-10">Set your nap duration in hours</p>
-            <input type="range" class="form-range" min="0" max="6" value="2">
+            <input type="range" class="form-range" min="0" max="6" value="2" id="normalNap">
+            <p>Hours: <span id="napHours">2</span></p>
           </div>
         </div>
       </div>
@@ -297,24 +298,24 @@
           <div class="card-header">
             <h1 class="-10 mb-0 brand-heading">Normal sleep and wake up times</h1>
             <div>Sleep time</div>
-            <select class="form-select form-select-sm">
-              <option selected>9 PM</option>
-              <option>10 PM</option>
-              <option>11 PM</option>
-              <option>12 AM</option>
-              <option>1 AM</option>
-              <option>2 AM</option>
-              <option>3 AM</option>
+            <select class="form-select form-select-sm" id="sleepStart">
+              <option selected id="start1">9 PM</option>
+              <option id="start2">10 PM</option>
+              <option id="start3">11 PM</option>
+              <option id="start4">12 AM</option>
+              <option id="start5">1 AM</option>
+              <option id="start6">2 AM</option>
+              <option id="start7">3 AM</option>
             </select>
             <div>Wake up time</div>
-            <select class="form-select form-select-sm">
-              <option selected>6 AM</option>
-              <option>7 AM</option>
-              <option>8 AM</option>
-              <option>9 AM</option>
-              <option>10 AM</option>
-              <option>11 AM</option>
-              <option>12 PM</option>
+            <select class="form-select form-select-sm" id="sleepEnd">
+              <option selected id="end1">6 AM</option>
+              <option id="end2">7 AM</option>
+              <option id="end3">8 AM</option>
+              <option id="end4">9 AM</option>
+              <option id="end5">10 AM</option>
+              <option id="end6">11 AM</option>
+              <option id="end7">12 PM</option>
             </select>
           </div>
         </div>
@@ -366,10 +367,6 @@
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
-            <script defer src="/dist/js/headerCommon.js"></script>
-    <script defer src="/dist/js/layoutLoader.js"></script>
-
-
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"
       integrity="sha256-dghWARbRe2eLlIJ56wNB+b760ywulqK3DzZYEpsg2fQ="
@@ -451,9 +448,15 @@
 
   </script>
 
-    <script>
-      
-    </script>
+<script>
+  // Display the slider's current value (the amount of time the user wants to take naps for)
+  var slider = document.getElementById("normalNap");
+  var output = document.getElementById("napHours");
+
+  slider.oninput = function() {
+    output.innerHTML = this.value;
+  }
+</script>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -485,6 +488,11 @@
   document.getElementById("saveButton").addEventListener("click", () => {
   const selectedCells = document.querySelectorAll(".calendar-cell.selected");
   const times = [];
+  let napHours = document.getElementById("napHours").innerHTML;
+  let startTime = document.getElementById("sleepStart");
+  let endTime = document.getElementById("sleepEnd");
+  
+  const sleepTimesAndHours = [];
 
   selectedCells.forEach(cell => {
     const row = cell.closest(".row");
@@ -497,6 +505,12 @@
 
   console.log(times);
 
+  // Getting the id for the selected option for sleep start and end times
+  const startTimeChoice = startTime.options[startTime.selectedIndex].getAttribute('id');
+  const endTimeChoice = endTime.options[endTime.selectedIndex].getAttribute('id');
+
+  sleepTimesAndHours.push({napHours, startTimeChoice, endTimeChoice});
+
   // Send to backend
   fetch("/api/save-naps", {
     method: "POST",
@@ -508,6 +522,21 @@
       //alert("Nap times saved successfully!");
     } else {
       alert("Error saving nap times.");
+    }
+  })
+  .catch(err => console.error("Save error:", err));
+
+  // Call to backend to add to database
+  fetch ("api/sleepStartEndHours", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({sleep: sleepTimesAndHours})
+  })
+  .then(res => {
+    if (res.ok) {
+
+    } else {
+      alert("Error saving sleep start and end times.");
     }
   })
   .catch(err => console.error("Save error:", err));
@@ -545,6 +574,9 @@ function formatHour(hour) {
 
 
 </script>
+
+    <script defer src="/dist/js/headerCommon.js"></script>
+    <script defer src="/dist/js/layoutLoader.js"></script>
 
     <!--end::Script-->
   </body>

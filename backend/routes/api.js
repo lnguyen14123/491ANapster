@@ -342,6 +342,53 @@ router.post("/save-naps", async (req, res) => {
   }
 });
 
+router.post("/sleepStartEndHours", async (req, res) => {
+  // Backend to add user's sleep start and end hours
+  const userID = req.session.user?.id;
+  if (!userID) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const sleep = req.body.sleep;
+  if (!Array.isArray(sleep) || sleep.length === 0) {
+    return res.status(400).send("No sleep start and end times provided");
+  }
+
+  try {
+    const parseStart = (item) => {
+      const parseItem = item[5];
+      return parseInt(parseItem) - 1;
+    };
+
+    const parseEnd = (item) => {
+      const parseItem = item[3];
+      return parseInt(parseItem) - 1;
+    };
+
+    const queryValues = sleep.map(({napHours, startTimeChoice, endTimeChoice}) => [
+      userID,
+      napHours,
+      parseStart(startTimeChoice),
+      parseEnd(endTimeChoice)
+    ]);
+
+    const queryAdd = `
+      INSERT INTO "scheduleSleepNap" (userid, "napHours", "sleepStart", "sleepEnd")
+      VALUES ${queryValues.map((_, i) => `($${i * 4 + 1}, $${i * 4 + 2}, $${i * 4 + 3}, $${i * 4 + 4})`).join(", ")}
+    `;
+
+    const queryFlat = queryValues.flat()
+
+    await pool.query(queryAdd, queryFlat);
+
+    res.json({message: "Saved successfully!"});
+  } catch (err) {
+    console.error("Error saving sleep start and end times:", err);
+    res.status(500).send("Something went wrong saving sleep start and end times");
+  }
+}); 
+
+
 router.get("/get-naps", async (req, res) => {
   const userID = req.session.user?.id;
   if (!userID) return res.status(401).send("Not logged in");
@@ -358,6 +405,55 @@ router.get("/get-naps", async (req, res) => {
     res.status(500).send("Something went wrong loading naps");
   }
 });
+
+router.post("/streakPostUpdate", async (req, res) => {
+  // Backend code for updating the user's current streak, longest streak, and the user's preferred nap length
+
+  const userID = req.session.user?.id;
+  if (!userID) {
+    return res.status(401).send("Not logged in");
+  }
+
+  const action = req.body.action;
+  if (!Array.isArray(action) || action.length === 0) {
+    return res.status(400).send("No sleep start and end times provided");
+  }
+
+  try {
+    if (action[0] == "POST") {
+      await pool.query(
+      `INSERT INTO "nappingprofile" (userid, currentstreak, longeststreak, nappingpoints, averagenapquality, preferrednaplen)
+      VALUES ($1, 0, 0, 0, 0, 0)
+      `, [userID]
+    );
+    }
+
+    res.json({message: "Saved successfully!"});
+  } catch (err) {
+    console.error("Error saving streak:", err);
+    res.status(500).send("Something went wrong saving streak");
+  }
+});
+
+
+router.get("/getStreak", async (req, res) => {
+  // Backend to get user's current streak
+  const userID = req.session.user?.id;
+  if (!userID) return res.status(401).send("Not logged in");
+
+  try {
+    const result = await pool.query(
+      `SELECT currentstreak FROM nappingprofile WHERE userid = $1`,
+      [userID]
+    );
+
+    res.json({streak: result.rows});
+  } catch (err) {
+    console.error("Error fetching naps:", err);
+    res.status(500).send("Something went wrong loading naps");
+  }
+});
+
 
 router.post("/napSchedule", async (req, res) => {
   const client = await pool.connect();
