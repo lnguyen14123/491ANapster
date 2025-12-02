@@ -895,6 +895,13 @@
           await saveNap({ startedAt, endedAt, durationSec });
           remainingSec = durationSec;
           render();
+
+          // Open a popup window with another file
+          const popup = window.open(
+            "sleepsurvey.html",
+            "Sleep-Servey",
+            "width=600,height=400,resizable=yes,scrollbars=yes"
+          );
         }
 
         function tick() {

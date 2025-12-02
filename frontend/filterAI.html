@@ -224,6 +224,13 @@
                   <p>AI Nap Scheduler</p></a
                 >
               </li>
+
+              <li class="nav-item">
+                <a href="./filterAI.html" class="nav-link">
+                  <i class="nav-icon bi bi-moon-stars"></i>
+                  <p>AI Filter</p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="./napSchedule.html" class="nav-link">
                   <i class="nav-icon bi bi-moon-stars"></i>
@@ -341,17 +348,17 @@
         <div class="app-content">
 
       <!--begin::Footer-->
-      <footer class="app-footer">
+      <!--<footer class="app-footer">-->
         <!--begin::To the end-->
-        <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
+        <!--<div class="float-end d-none d-sm-inline">Dream More. Do More.</div>-->
         <!--end::To the end-->
         <!--begin::Copyright-->
-        <strong>
+        <!--<strong>
           Copyright &copy; 2025&nbsp;
         </strong>
-        All rights reserved.
+        All rights reserved.-->
         <!--end::Copyright-->
-      </footer>
+      <!--</footer>-->
 
       <!--Asks the user for their gender-->
       <div class="app-content">
@@ -360,7 +367,7 @@
                 <div class="card-header">
                     <h1 class="-10 mb-0 brand-heading">Select your gender</h1>
                     <select class="form-select form-select-sm" id="genderSelect">
-                      <option id="gender1">Male</option>
+                      <option selected id="gender1">Male</option>
                       <option id="gender2">Female</option>
                       <option id="gender3">Other</option>
                       <option id="gender4">I rather not say</option>
@@ -464,7 +471,7 @@
       </div>
     </div>
     <div class="save-container" style="text-align: center; margin-top: 20px; margin-bottom: 20px;">
-            <button id="saveButton" style="
+            <button id="confirmButton" style="
               padding: 8px 16px;
               font-size: 16px;
               border: none;
@@ -519,6 +526,43 @@
           });
         }
       });
+    </script>
+
+    <script>
+      // Sending the data for AI filters into the backend to adjust AI responses
+      document.getElementById("confirmButton").addEventListener("click", () => {
+        const filters = [];
+
+        let gender = document.getElementById("genderSelect");
+        let ageRange = document.getElementById("ageSelect");
+        let occupation = document.getElementById("jobSelect");
+        let startWorkTime = document.getElementById("workStart");
+        let endWorkTime = document.getElementById("workEnd");
+
+        // Obtaining the id for the selected option for the demographics
+        const genderChoice = gender.options[gender.selectedIndex].getAttribute('id');
+        const ageRangeChoice = ageRange.options[ageRange.selectedIndex].getAttribute('id');
+        const occupationChoice = occupation.options[occupation.selectedIndex].getAttribute('id');
+        const startWorkTimeChoice = startWorkTime.options[startWorkTime.selectedIndex].getAttribute('id');
+        const endWorkTimeChoice = endWorkTime.options[endWorkTime.selectedIndex].getAttribute('id');
+
+        filters.push({genderChoice, ageRangeChoice, occupationChoice, startWorkTimeChoice, endWorkTimeChoice});
+
+        // Send to the backend
+        fetch ("api/saveAIFilters", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({filter: filters})
+        })
+        .then(res => {
+          if (res.ok) {
+
+          } else {
+            alert("Error saving filters");
+          }
+        })
+        .catch(err => console.error("Save error:", err));
+      })
     </script>
 
     <!--end::OverlayScrollbars Configure-->
