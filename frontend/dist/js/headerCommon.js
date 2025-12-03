@@ -67,15 +67,16 @@ function initHeaderCommon() {
 
   // 3) sidebar scroll
   try {
-    const sidebarWrapper = document.querySelector(".sidebar-wrapper");
+    const sidebarWrapper = document.querySelector('.sidebar-wrapper');
     if (
       sidebarWrapper &&
-      typeof OverlayScrollbarsGlobal?.OverlayScrollbars !== "undefined"
+      window.OverlayScrollbarsGlobal &&
+      window.OverlayScrollbarsGlobal.OverlayScrollbars
     ) {
-      OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
+      window.OverlayScrollbarsGlobal.OverlayScrollbars(sidebarWrapper, {
         scrollbars: {
-          theme: "os-theme-light",
-          autoHide: "leave",
+          theme: 'os-theme-light',
+          autoHide: 'leave',
           clickScroll: true,
         },
       });

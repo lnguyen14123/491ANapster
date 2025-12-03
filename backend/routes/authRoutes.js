@@ -148,6 +148,62 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
+// POST: Change password (Jihye Kim)
+router.post("/changePassword", async (req, res) => {
+  try {
+    const userID = req.session.user?.id;
+    if (!userID) {
+      return res.status(401).send("Not logged in");
+    }
+
+    const { currentPassword, newPassword } = req.body || {};
+    if (!currentPassword || !newPassword) {
+      return res.status(400).send("Missing password fields");
+    }
+
+    // 1) Retrieve the current user's password hash
+    const result = await pool.query(
+      `SELECT password_hash
+       FROM "User"
+       WHERE userid = $1`,
+      [userID]
+    );
+
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+
+    if (!user.password_hash) {
+      console.error("password_hash is NULL/undefined for user:", userID, user);
+      return res
+        .status(500)
+        .send("Password is not set properly for this user.");
+    }
+
+    // 2) Compare it with the current password (same pattern as login)
+    const match = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!match) {
+      return res.status(400).send("Current password is incorrect");
+    }
+
+    // 3) Hash the new password and save it
+    const SALT_ROUNDS = 10;
+    const newHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    await pool.query(
+      `UPDATE "User"
+       SET password_hash = $1
+       WHERE userid = $2`,
+      [newHash, userID]
+    );
+
+    res.send("Password updated successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong while changing password");
+  }
+});
 
   
 export default router;
