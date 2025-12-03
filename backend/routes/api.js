@@ -677,4 +677,178 @@ router.get("/recommendations", async (req, res) => {
   }
 });
 
+
+router.post("/saveSurvey", async (req, res) => {
+  try {
+    const { napID, quality, wakeup, notes } = req.body;
+
+    if (!napID) {
+      return res.status(400).json({ error: "napID is required" });
+    }
+
+    console.log(req.body);
+
+    const result = await pool.query(
+      `UPDATE nap
+       SET quality = $1,
+           wakeup = $2,
+           notes  = $3
+       WHERE napid = $4
+       RETURNING napid`,
+      [quality || null, wakeup || null, notes || null, napID]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Nap not found" });
+    }
+
+    // Use napID as submissionKey
+    res.json({ submissionKey: napID });
+
+  } catch (err) {
+    console.error("Error saving survey:", err);
+    res.status(500).json({ error: "Failed to save survey" });
+  }
+});
+
+
+router.get("/community_insights", async (req, res) => {
+  try {
+    // 1. Overview Stats ----------------------------------------------
+    const overviewQuery = `
+      SELECT 
+        COUNT(*) AS total_naps,
+        AVG(EXTRACT(EPOCH FROM (napend - napstart)) / 60) AS avg_duration,
+        COUNT(DISTINCT userid) AS active_users,
+        TO_CHAR(
+          date_trunc('hour', napstart), 
+          'HH12:MI AM'
+        ) AS peak_time
+      FROM nap
+      GROUP BY peak_time
+      ORDER BY COUNT(*) DESC
+      LIMIT 1;
+    `;
+
+    const overviewResult = await pool.query(overviewQuery);
+
+    const overview = overviewResult.rows.length
+      ? {
+          totalNaps: Number(overviewResult.rows[0].total_naps),
+          avgDuration: Math.round(Number(overviewResult.rows[0].avg_duration)),
+          activeUsers: Number(overviewResult.rows[0].active_users),
+          peakTime: overviewResult.rows[0].peak_time,
+        }
+      : {
+          totalNaps: 0,
+          avgDuration: 0,
+          activeUsers: 0,
+          peakTime: "N/A",
+        };
+
+    // 2. Duration Distribution Buckets -------------------------------
+    const durationQuery = `
+      SELECT
+        CASE
+          WHEN dur <= 10 THEN '0–10 min'
+          WHEN dur <= 20 THEN '10–20 min'
+          WHEN dur <= 30 THEN '20–30 min'
+          WHEN dur <= 45 THEN '30–45 min'
+          WHEN dur <= 60 THEN '45–60 min'
+          ELSE '60+ min'
+        END AS range,
+        COUNT(*) AS count
+      FROM (
+        SELECT EXTRACT(EPOCH FROM (napend - napstart)) / 60 AS dur
+        FROM nap
+        WHERE napend IS NOT NULL
+      ) t
+      GROUP BY range
+      ORDER BY min(dur);
+    `;
+
+    const durationResult = await pool.query(durationQuery);
+    const durationDistribution = durationResult.rows;
+
+    // 3. Quality Ratings ---------------------------------------------
+    const qualityQuery = `
+      SELECT 
+        CASE quality
+          WHEN 1 THEN 'Poor'
+          WHEN 2 THEN 'Fair'
+          WHEN 3 THEN 'Good'
+          WHEN 4 THEN 'Very Good'
+          WHEN 5 THEN 'Excellent'
+          ELSE 'Unrated'
+        END AS rating,
+        COUNT(*) AS count
+      FROM nap
+      GROUP BY rating
+      ORDER BY rating;
+    `;
+
+    const qualityResult = await pool.query(qualityQuery);
+    const qualityRatings = qualityResult.rows;
+
+    // 4. Time Distribution (Hourly) ----------------------------------
+    const hourlyQuery = `
+      SELECT 
+        EXTRACT(HOUR FROM napstart)::int AS hour,
+        COUNT(*) AS count
+      FROM nap
+      GROUP BY hour
+      ORDER BY hour;
+    `;
+
+    const hourlyResult = await pool.query(hourlyQuery);
+
+    const timeDistribution = {
+      labels: hourlyResult.rows.map(r => `${r.hour}:00`),
+      data: hourlyResult.rows.map(r => Number(r.count)),
+    };
+
+    // 5. Weekday Pattern ----------------------------------------------
+    const weekdayQuery = `
+      SELECT
+        TO_CHAR(napstart, 'Day') AS weekday,
+        AVG(EXTRACT(EPOCH FROM (napend - napstart)) / 60) AS avg_duration,
+        COUNT(*) AS count
+      FROM nap
+      GROUP BY weekday
+      ORDER BY MIN(EXTRACT(ISODOW FROM napstart));
+    `;
+
+    const weekdayResult = await pool.query(weekdayQuery);
+
+    const weekdayPattern = {
+      labels: weekdayResult.rows.map(r => r.weekday.trim()),
+      avgDuration: weekdayResult.rows.map(r => Math.round(Number(r.avg_duration))),
+      napCount: weekdayResult.rows.map(r => Number(r.count)),
+    };
+
+    // 6. Top Locations (Placeholder) ----------------------------------
+    // You don’t have a "location" column yet, so we return dummy values
+    const topLocations = [
+      { name: "Couch", count: 0 },
+      { name: "Bed", count: 0 },
+      { name: "Office Desk", count: 0 },
+    ];
+
+    // Final JSON ------------------------------------------------------
+    res.json({
+      overview,
+      durationDistribution,
+      qualityRatings,
+      topLocations,          // until you add a real column
+      timeDistribution,
+      weekdayPattern,
+    });
+
+  } catch (err) {
+    console.error("Error generating community insights:", err);
+    res.status(500).json({ error: "Failed to generate insights" });
+  }
+});
+
+
 export default router;

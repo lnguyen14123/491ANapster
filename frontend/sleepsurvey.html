@@ -358,6 +358,33 @@
       const consentWarning = document.getElementById("consentWarning");
       const surveyQuestions = document.getElementById("surveyQuestions");
       const form = document.getElementById("surveyForm");
+      const submitBtn = document.querySelector(".btn-submit");
+
+      const params = new URLSearchParams(window.location.search);
+      const napID = params.get("napID");
+
+      console.log("napID is:", napID);
+
+      async function saveSurveyToDatabase(formData) {
+        const response = await fetch("/api/saveSurvey", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            napID,
+            quality: formData.quality,
+            wakeup: formData.wakeup,
+            notes: formData.notes,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to save survey");
+        }
+
+        const data = await response.json();
+        // expecting something like { submissionKey: "abc123" }
+        return data.submissionKey;
+      }
 
       // Handle consent change
       function handleConsentChange() {
@@ -388,7 +415,7 @@
         // Collect form data
         const formData = {
           consent: document.querySelector('input[name="consent"]:checked')
-            .value,
+            ?.value,
           quality: document.querySelector('input[name="quality"]:checked')
             ?.value,
           wakeup: document.querySelector('input[name="wakeup"]:checked')?.value,
@@ -409,18 +436,13 @@
           // Re-enable button on error
           submitBtn.disabled = false;
           submitBtn.textContent = "Submit Survey";
-          showInPageAlert(
-            "There was an error submitting your survey. Please try again.",
-            "error"
-          );
+          console.log(error);
         }
       });
 
       // Show success message
       function showSuccessMessage(key) {
-        submissionId.textContent = `Submission ID: ${key}`;
-        overlay.classList.add("show");
-        successMessage.classList.add("show");
+        alert("Survey saved!");
       }
 
       // Start new survey

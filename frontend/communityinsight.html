@@ -301,7 +301,7 @@
       async function fetchCommunityData() {
         try {
           const response = await fetch(
-            `${API_BASE_URL}/api/community/insights`,
+            `${API_BASE_URL}/api/community_insights`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -316,67 +316,7 @@
         } catch (error) {
           console.error("Error fetching community data:", error);
           // Return mock data for development/testing
-          return generateMockData();
         }
-      }
-
-      // Generate mock data for testing
-      function generateMockData() {
-        return {
-          overview: {
-            totalNaps: 1247,
-            avgDuration: 28,
-            activeUsers: 342,
-            peakTime: "2:00 PM",
-          },
-          durationDistribution: [
-            { range: "0-10 min", count: 87 },
-            { range: "10-20 min", count: 234 },
-            { range: "20-30 min", count: 456 },
-            { range: "30-45 min", count: 298 },
-            { range: "45-60 min", count: 123 },
-            { range: "60+ min", count: 49 },
-          ],
-          qualityRatings: [
-            { rating: "Excellent", count: 423 },
-            { rating: "Good", count: 567 },
-            { rating: "Fair", count: 189 },
-            { rating: "Poor", count: 68 },
-          ],
-          topLocations: [
-            { name: "Office Desk", count: 342 },
-            { name: "Library Study Room", count: 298 },
-            { name: "Home Bedroom", count: 276 },
-            { name: "Park Bench", count: 234 },
-            { name: "Couch", count: 198 },
-          ],
-          timeDistribution: {
-            labels: [
-              "6 AM",
-              "8 AM",
-              "10 AM",
-              "12 PM",
-              "2 PM",
-              "4 PM",
-              "6 PM",
-              "8 PM",
-            ],
-            data: [12, 34, 89, 156, 234, 187, 98, 45],
-          },
-          weekdayPattern: {
-            labels: [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday",
-            ],
-            avgDuration: [25, 27, 28, 29, 31, 35, 38],
-            napCount: [198, 212, 223, 234, 198, 156, 134],
-          },
-        };
       }
 
       // Update overview stats
@@ -453,14 +393,17 @@
 
       // Create Quality Ratings Chart
       function createQualityChart(data) {
+        const series = data.qualityRatings.map((q) => Number(q.count)); // <- ensure numbers
+        const labels = data.qualityRatings.map((q) => q.rating);
+
         const options = {
-          series: data.qualityRatings.map((q) => q.count),
+          series: series,
           chart: {
             type: "donut",
             height: 300,
           },
-          labels: data.qualityRatings.map((q) => q.rating),
-          colors: ["#43e97b", "#4facfe", "#f5576c", "#667eea"],
+          labels: labels,
+          colors: ["#43e97b", "#4facfe", "#d3d3d3", "#f5576c"],
           legend: {
             position: "bottom",
           },
@@ -478,7 +421,6 @@
         );
         chart.render();
       }
-
       // Create Locations List
       function createLocationsList(locations) {
         const container = document.getElementById("locationsList");

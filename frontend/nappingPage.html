@@ -898,8 +898,8 @@
 
           // Open a popup window with another file
           const popup = window.open(
-            "sleepsurvey.html",
-            "Sleep-Servey",
+            `sleepsurvey.html?napID=${encodeURIComponent(currNapID)}`,
+            "Sleep-Survey",
             "width=600,height=400,resizable=yes,scrollbars=yes"
           );
         }
