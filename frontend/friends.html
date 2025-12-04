@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Napster | Friends</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts / Icons / AdminLTE -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css" />
+  <link rel="stylesheet" href="./dist/css/adminlte.css" />
+  <link rel="stylesheet" href="./dist/css/theme.css">
+  <link rel="icon" type="image/png" href="./dist/assets/img/napsterlogo.png" />
+
+  <style>
+    /* Center content wrapper (similar to glass card area) */
+    .friends-center-wrap {
+      position: relative;
+      z-index: 2;
+      min-height: calc(100vh - 112px);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2.5rem 1rem;
+    }
+
+    .friends-shell {
+      width: min(1080px, 100%);
+      background: var(--glass);
+      backdrop-filter: blur(10px) saturate(1.1);
+      border: 1px solid rgba(139, 92, 246, 0.18);
+      box-shadow: 0 20px 60px rgba(2, 6, 23, 0.08);
+      border-radius: 24px;
+      padding: 20px 22px;
+    }
+
+    .friends-header-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #312e81;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .friends-header-sub {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    /* Tabs */
+    .friends-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .friends-tabs button {
+      font-size: 0.95rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .friends-tabs button.active {
+      border-color: var(--violet);
+      background: var(--violet-100);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .friends-tabs button:focus-visible {
+      outline: 2px solid var(--violet);
+      outline-offset: 2px;
+    }
+
+    section[hidden] {
+      display: none !important;
+    }
+
+    /* Search / input rows */
+    .friends-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .friends-row label {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .friends-row input[type="text"] {
+      padding: 0.55rem 0.8rem;
+      border-radius: 0.6rem;
+      border: 1px solid var(--border-soft);
+      min-width: 260px;
+      font-size: 0.95rem;
+      background: #ffffff;
+    }
+
+    .btn-nap-primary {
+      border-radius: 9999px;
+      border: none;
+      background: var(--violet);
+      color: #fff;
+      font-size: 0.95rem;
+      padding: 0.55rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 600;
+    }
+
+    .btn-nap-primary:hover {
+      background: var(--violet-600);
+    }
+
+    .btn-nap-outline {
+      border-radius: 9999px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--violet-600);
+      font-size: 0.9rem;
+      padding: 0.45rem 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 500;
+    }
+
+    /* Card-style section container (inside glass) */
+    .friends-section-card {
+      background: #ffffffc9;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, 0.04);
+      padding: 16px 16px 18px;
+      margin-bottom: 12px;
+    }
+
+    .friends-section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .friends-section-help {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Grid for results / requests / friends */
+    .friends-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .friends-card {
+      background: #ffffff;
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .friends-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .friends-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      object-fit: cover;
+      background: #e5e7eb;
+    }
+
+    .friends-card-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .friends-card-name {
+      font-weight: 600;
+      color: #111827;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .friends-card-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .friends-pill-row {
+      margin-top: 0.25rem;
+    }
+
+    .friends-pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      padding: 0.05rem 0.45rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-right: 0.3rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .friends-card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+
+    .friends-footer-note {
+      margin-top: 0.9rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .badge-status {
+      height: 10px;
+      width: 10px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .status-online {
+      background: #22c55e;
+    }
+
+    .status-away {
+      background: #facc15;
+    }
+
+    .status-offline {
+      background: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .friends-shell {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+  <div class="app-wrapper">
+    <!-- Header -->
+    <nav id="nav-placeholder" class="app-header navbar navbar-expand bg-body">
+      <!-- JS file -->
+    </nav>
+    <!-- SideBar -->
+    <aside id="sidebar-placeholder" class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+      <!-- JS file -->
+    </aside>
+
+    <!-- Main Friends Content -->
+    <main class="app-main">
+      <!-- ambient background blobs -->
+      <div class="ambient" aria-hidden="true">
+        <div class="blob violet"></div>
+        <div class="blob sky"></div>
+      </div>
+
+      <!-- Content header (breadcrumb) -->
+      <div class="app-content-header">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-6">
+              <h3 class="mb-0">Friends</h3>
+            </div>
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-end">
+                <li class="breadcrumb-item">
+                  <a href="./nappingPage.html">Home</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                  Friends
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content body -->
+      <div class="friends-center-wrap">
+        <div class="friends-shell">
+          <!-- Header text -->
+          <div class="friends-header-title">
+            <i class="bi bi-people-fill"></i>
+            <span>Friends System</span>
+          </div>
+          <p class="friends-header-sub">
+            Search for other Napster users, send friend requests, manage
+            incoming requests, and keep track of your current friends list.
+          </p>
+
+          <!-- Tabs -->
+          <div class="friends-tabs">
+            <button type="button" class="active" data-tab="find" aria-controls="tab-find" aria-selected="true">
+              <i class="bi bi-search"></i>
+              <span>Find</span>
+            </button>
+            <button type="button" data-tab="requests" aria-controls="tab-requests" aria-selected="false">
+              <i class="bi bi-person-plus"></i>
+              <span>Requests</span>
+            </button>
+            <button type="button" data-tab="friends" aria-controls="tab-friends" aria-selected="false">
+              <i class="bi bi-people"></i>
+              <span>Friends</span>
+            </button>
+          </div>
+
+          <!-- FIND -->
+          <section id="tab-find">
+            <div class="friends-section-card">
+              <div class="friends-section-title">
+                <i class="bi bi-search"></i>
+                <span>Find new friends</span>
+              </div>
+              <p class="friends-section-help">
+                Search by name, username, or email. When backend routes are
+                ready, this will call your API and show real users.
+              </p>
+
+              <div class="friends-row">
+                <label for="friendSearch" class="form-label mb-0">
+                  Search query
+                </label>
+                <input id="friendSearch" type="text" placeholder="e.g. Jane Doe, @janed, jane@example.com"
+                  aria-label="Search friends" />
+                <button id="friendSearchBtn" type="button" class="btn-nap-primary">
+                  <i class="bi bi-search"></i>
+                  <span>Search</span>
+                </button>
+              </div>
+
+              <div id="searchResults" class="friends-grid">
+              </div>
+            </div>
+          </section>
+
+          <!-- REQUESTS -->
+          <section id="tab-requests" hidden>
+            <div class="friends-section-card">
+              <div class="friends-section-title">
+                <i class="bi bi-inbox"></i>
+                <span>Friend requests</span>
+              </div>
+              <p class="friends-section-help">
+                Review incoming requests and track requests you’ve sent to
+                others.
+              </p>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <h6 class="fw-semibold mb-2">
+                    <i class="bi bi-arrow-down-circle me-1"></i>Incoming
+                  </h6>
+                  <div id="incomingRequests" class="friends-grid">
+                    <!-- Placeholder incoming -->
+                    <div class="friends-card">
+                      <div class="friends-card-header">
+                        <img class="friends-avatar"
+                          src="https://ui-avatars.com/api/?name=Alex+Napper&background=random&size=80"
+                          alt="Alex Napper" />
+                        <div class="friends-card-main">
+                          <div class="friends-card-name">Alex Napper</div>
+                          <div class="friends-card-meta">
+                            Sent 2 hours ago • “Power nap buddy?”
+                          </div>
+                        </div>
+                      </div>
+                      <div class="friends-card-actions">
+                        <button class="btn-nap-primary btn-sm">
+                          <i class="bi bi-check-lg"></i> Accept
+                        </button>
+                        <button class="btn-nap-outline btn-sm">
+                          <i class="bi bi-x-lg"></i> Decline
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mt-3 mt-md-0">
+                  <h6 class="fw-semibold mb-2">
+                    <i class="bi bi-arrow-up-circle me-1"></i>Outgoing
+                  </h6>
+                  <div id="outgoingRequests" class="friends-grid">
+                    <!-- Placeholder outgoing -->
+                    <div class="friends-card">
+                      <div class="friends-card-header">
+                        <img class="friends-avatar"
+                          src="https://ui-avatars.com/api/?name=Bernard+Tran&background=random&size=80"
+                          alt="Bernard Tran" />
+                        <div class="friends-card-main">
+                          <div class="friends-card-name">Bernard Tran</div>
+                          <div class="friends-card-meta">
+                            Pending • Sent yesterday
+                          </div>
+                        </div>
+                      </div>
+                      <div class="friends-card-actions">
+                        <button class="btn-nap-outline btn-sm">
+                          <i class="bi bi-clock-history"></i> Pending
+                        </button>
+                        <button class="btn-nap-outline btn-sm">
+                          <i class="bi bi-x-circle"></i> Cancel request
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FRIENDS -->
+          <section id="tab-friends" hidden>
+            <div class="friends-section-card">
+              <div class="friends-section-title">
+                <i class="bi bi-people"></i>
+                <span>Your friends</span>
+              </div>
+              <p class="friends-section-help">
+                Filter your friends, quickly check streaks, and nudge them to
+                take a nap.
+              </p>
+
+              <div class="friends-row">
+                <label for="friendsFilter" class="form-label mb-0">
+                  Filter
+                </label>
+                <input id="friendsFilter" type="text" placeholder="Filter friends by name or username"
+                  aria-label="Filter friends" />
+                <button id="friendsFilterClear" type="button" class="btn-nap-outline">
+                  <i class="bi bi-eraser"></i>
+                  <span>Clear</span>
+                </button>
+              </div>
+
+              <div id="friendsList" class="friends-grid">
+                <!-- Placeholder friends -->
+                <div class="friends-card">
+                  <div class="friends-card-header">
+                    <img class="friends-avatar"
+                      src="https://ui-avatars.com/api/?name=Jane+Doe&background=random&size=80" alt="Jane Doe" />
+                    <div class="friends-card-main">
+                      <div class="friends-card-name">Jane Doe</div>
+                      <div class="friends-card-meta">
+                        <span class="badge-status status-online"></span>
+                        Online • Last nap: 2 hours ago
+                      </div>
+                      <div class="friends-pill-row">
+                        <span class="friends-pill">Streak: 15 days</span>
+                        <span class="friends-pill">Pref: 20 min</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="friends-card-actions">
+                    <button class="btn-nap-primary btn-sm">
+                      <i class="bi bi-bell"></i> Nudge
+                    </button>
+                    <button class="btn-nap-outline btn-sm">
+                      <i class="bi bi-person"></i> View profile
+                    </button>
+                    <button class="btn-nap-outline btn-sm">
+                      <i class="bi bi-person-dash"></i> Unfriend
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <p class="friends-footer-note">
+            Tip: Later you can add privacy options in <strong>Settings → Privacy</strong> to
+            control who can find or add you. This page currently uses placeholder
+            cards until real backend APIs are wired up.
+          </p>
+        </div>
+      </div>
+
+      <footer class="app-footer">
+        <div class="float-end d-none d-sm-inline">Dream More. Do More.</div>
+        <strong>Copyright &copy; 2025&nbsp;</strong> All rights reserved.
+      </footer>
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/browser/overlaysscrollbars.browser.es6.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  <script src="../../dist/js/adminlte.js"></script>
+
+  <!-- header & sidebar script -->
+  <script defer src="./dist/js/headerCommon.js"></script>
+  <script defer src="./dist/js/layoutLoader.js"></script>
+
+  <script type="module" src="./dist/js/friends.js"></script>
+
+  <script>
+
+    // Auth display 
+    fetch("/api/user")
+      .then((res) => {
+        if (res.status === 401) {
+          location.href = "/signin";
+          return null;
+        }
+        return res.json();
+      })
+      .then(
+        (d) =>
+          d?.username &&
+          document
+            .querySelectorAll(".username-display")
+            .forEach((el) => (el.textContent = d.username))
+      )
+      .catch(() => { });
+    document.getElementById("logout-btn")?.addEventListener("click", () => {
+      fetch("/logout", { method: "POST" }).then(
+        () => (location.href = "/signin")
+      );
+    });
+  </script>
+
+  <!-- Tabs + simple front-end behavior -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      //Friends tab filter only
+      const friendsFilter = document.getElementById("friendsFilter");
+      const friendsFilterClear = document.getElementById("friendsFilterClear");
+      const friendsList = document.getElementById("friendsList");
+
+      function applyFriendFilter() {
+        const term = (friendsFilter?.value || "").trim().toLowerCase();
+        const cards = friendsList?.querySelectorAll(".friends-card") || [];
+        cards.forEach((card) => {
+          const name =
+            card.querySelector(".friends-card-name")?.textContent.toLowerCase() || "";
+          card.style.display = !term || name.includes(term) ? "" : "none";
+        });
+      }
+
+      friendsFilter?.addEventListener("input", applyFriendFilter);
+      friendsFilterClear?.addEventListener("click", () => {
+        friendsFilter.value = "";
+        applyFriendFilter();
+      });
+    });
+  </script>
+
+  <!-- Friend Profile Modal -->
+  <div class="modal fade" id="friendProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-circle me-1"></i>
+            <span data-field="displayName">Friend profile</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="d-flex align-items-center mb-3">
+            <img data-field="avatar" src="https://ui-avatars.com/api/?name=User&background=random&size=80" alt="avatar"
+              class="rounded-circle me-3" style="width:64px;height:64px;object-fit:cover;">
+            <div>
+              <div class="fw-semibold" data-field="displayName-main">Display Name</div>
+              <div class="text-muted small" data-field="username">@username</div>
+              <div class="text-muted small" data-field="memberSince">Member since —</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="fw-semibold small text-muted">Bio</div>
+            <div data-field="bio">-</div>
+          </div>
+
+          <div class="mb-2">
+            <div class="fw-semibold small text-muted">City</div>
+            <div data-field="city">-</div>
+          </div>
+
+          <div class="mb-2">
+            <div class="fw-semibold small text-muted">Website</div>
+            <div>
+              <a href="#" target="_blank" rel="noopener" data-field="website-link">-</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="privateProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <h4 style="text-align:center;">This profile is private</h4>
+        <p class="text-center text-muted">You cannot view this user’s details.</p>
+        <div class="text-center">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

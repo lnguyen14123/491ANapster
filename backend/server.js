@@ -13,6 +13,7 @@ import apiRoutes from "./routes/api.js";
 import { Pool } from "pg";
 import dotenv from "dotenv";
 import musicRoutes from "./routes/musicRoutes.js"; // Kate Dinh add for musicApi
+import friendRoutes from "./routes/friendRoutes.js"; //Jihye Kim add for friendApi
 
 
 // Required to simulate __dirname in ES Modules
@@ -47,6 +48,7 @@ app.use(
 app.use("/", authRoutes);
 app.use("/", appRoutes);
 app.use("/api", apiRoutes);
+app.use("/api/friends", friendRoutes);
 
 dotenv.config();
 

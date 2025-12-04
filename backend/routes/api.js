@@ -850,5 +850,354 @@ router.get("/community_insights", async (req, res) => {
   }
 });
 
+//GET: user profile (Jihye Kim)
+router.get('/userprofile', async (req, res) => {
+  if (!req.session?.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  try {
+    const userId = req.session.user.id; // "User".userid (VARCHAR(36))
+
+    const { rows } = await pool.query(
+      `
+      SELECT
+        u.userid,
+        u.name,
+        u.email,
+        u.created_at AS user_created_at,
+        u.cityname  AS user_city,
+        u.country AS user_country,
+
+        up.display_name AS "displayName",
+        up.bio,
+        up.website,
+        up.ringtone_name,
+        up.avatar_url AS "avatarUrl",
+        up.updated_at,
+
+        -- Total naps
+        (
+          SELECT COUNT(*)
+          FROM nap n
+          WHERE n.userid = u.userid AND n.napend IS NOT NULL
+        ) AS total_naps,
+
+        -- Average nap length
+        (
+          SELECT ROUND(AVG(EXTRACT(EPOCH FROM (n.napend - n.napstart)) / 60.0))::int
+          FROM nap n
+          WHERE n.userid = u.userid AND n.napend IS NOT NULL
+        ) AS avg_nap_len,
+
+        -- 5 recent activities
+        (
+          SELECT COALESCE(
+            json_agg(
+              json_build_object(
+                'text',
+                CONCAT(
+                  'Took a ',
+                  COALESCE(ROUND(EXTRACT(EPOCH FROM (n2.napend - n2.napstart)) / 60.0)::int, 0),
+                  ' min nap'
+                ),
+                'time',
+                to_char(n2.napstart, 'YYYY-MM-DD HH24:MI')
+              )
+            ),
+            '[]'::json
+          )
+          FROM (
+            SELECT n2.napstart, n2.napend
+            FROM nap n2
+            WHERE n2.userid = u.userid
+            ORDER BY n2.napstart DESC
+            LIMIT 5
+          ) AS n2
+        ) AS activity
+
+      FROM "User" AS u
+      LEFT JOIN userprofile AS up
+        ON up.userid = u.userid
+      WHERE u.userid = $1
+      `,
+      [userId]
+    );
+
+    const r = rows[0] || {};
+
+    const city = r.user_city || null;
+    const country = r.user_country || null;
+    const location =
+      city && country ? `${city}, ${country}` : city ? city : (country || null);
+
+    res.json({
+      displayName: r.displayName ?? null,
+      avatarUrl: r.avatarUrl ?? null,
+      bio: r.bio ?? null,
+      location,
+      website: r.website ?? null,
+      created_at: r.user_created_at ?? null,
+      preferences: {
+        ringtoneName: r.ringtone_name ?? null,
+        defaultNap: null
+      },
+      stats: {
+        totalNaps: r.total_naps ?? 0,
+        avgNapLen: r.avg_nap_len ?? null,
+        streak: null
+      },
+      activity: r.activity ?? []
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+const norm = (v) => (typeof v === 'string' ? v.trim() : null);
+function parseLocation(input) {
+  const s = norm(input);
+  if (!s) return { city: null, country: null };
+  const [cityRaw, ...rest] = s.split(',');
+  const city = norm(cityRaw);
+  const country = norm(rest.join(','));
+  return { city, country };
+}
+
+// PUT: update user profile (Jihye Kim)
+router.put('/profile', async (req, res) => {
+  if (!req.session?.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+  const userId = req.session.user.id;
+  const displayName  = norm(req.body?.displayName);
+  const website      = norm(req.body?.website);
+  const bio          = norm(req.body?.bio);
+  const ringtoneName = norm(req.body?.ringtoneName);
+  const { city, country } = parseLocation(req.body?.location); // e.g. "LA, USA"
+
+  try {
+    // --- city / country validation ---
+    let newCity = city ? norm(city) : null;
+    let newCountry = country ? norm(country) : null;
+
+    if (newCity && newCountry) {
+      const check = await pool.query(
+        `SELECT 1 FROM city WHERE country = $1 AND cityname = $2`,
+        [newCountry, newCity]
+      );
+      if (check.rows.length === 0) {
+        return res.status(400).json({ error: 'Unknown city / country combination' });
+      }
+    } else {
+      // if empty string -> treat as "no change"
+      newCity = null;
+      newCountry = null;
+    }
+
+    await pool.query(
+      `
+      UPDATE "User"
+      SET
+        cityname = COALESCE(NULLIF($1, ''), cityname),
+        country  = COALESCE(NULLIF($2, ''), country)
+      WHERE userid = $3
+      `,
+      [newCity, newCountry, userId]
+    );
+
+    await pool.query(
+      `
+      INSERT INTO userprofile (userid, display_name, bio, website, ringtone_name, updated_at)
+      VALUES ($1, $2, $3, $4, $5, now())
+      ON CONFLICT (userid) DO UPDATE SET
+        display_name = COALESCE(EXCLUDED.display_name,  userprofile.display_name),
+        bio          = COALESCE(EXCLUDED.bio,          userprofile.bio),
+        website      = COALESCE(EXCLUDED.website,      userprofile.website),
+        ringtone_name= COALESCE(EXCLUDED.ringtone_name,userprofile.ringtone_name),
+        updated_at   = now()
+      `,
+      [userId, displayName, bio, website, ringtoneName]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// GET: settings from userprofile (Jihye Kim)
+router.get('/settings', async (req, res) => {
+  if (!req.session?.user) return res.status(401).json({ error: 'Not logged in' });
+  const userId = req.session.user.id;
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        up.ringtone_name,
+        up.settings
+      FROM userprofile up
+      WHERE up.userid = $1
+    `, [userId]);
+
+    const r = rows[0] || {};
+    res.json({
+      ringtoneName: r?.ringtone_name ?? null,
+      settings: r?.settings ?? {}   // {alarm_volume, playlist_url, ...}
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// POST: save avatar URL (ui-avatars)
+router.post('/profile/avatar-url', async (req, res) => {
+  if (!req.session?.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const userId = req.session.user.id;
+  const avatarUrl = norm(req.body?.avatarUrl);
+
+  if (!avatarUrl) {
+    return res.status(400).json({ error: 'avatarUrl is required' });
+  }
+
+  try {
+    await pool.query(
+      `
+      INSERT INTO userprofile (userid, avatar_url, updated_at)
+      VALUES ($1, $2, now())
+      ON CONFLICT (userid) DO UPDATE SET
+        avatar_url = EXCLUDED.avatar_url,
+        updated_at = now()
+      `,
+      [userId, avatarUrl]
+    );
+
+    res.json({ ok: true, avatarUrl });
+  } catch (err) {
+    console.error('avatar-url update error', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT: update settings in userprofile (Jihye Kim)
+router.put('/settings', async (req, res) => {
+  if (!req.session?.user) return res.status(401).json({ error: 'Not logged in' });
+  const userId = req.session.user.id;
+
+  // ---- validate & normalize ----
+  const _vol = req.body?.alarm_volume;
+  let alarm_volume = (_vol === undefined || _vol === null) ? undefined
+    : Math.max(0, Math.min(100, Number(_vol)));
+  if (alarm_volume !== undefined && !Number.isFinite(alarm_volume)) alarm_volume = undefined;
+
+  const playlist_url = (req.body?.playlist_url ?? '').trim() || undefined;
+
+  const nb = (v) => (typeof v === 'boolean' ? v : (v === 'true' ? true : (v === 'false' ? false : undefined)));
+  const notificationEnabled = nb(req.body?.notificationEnabled);
+  const privateProfile = nb(req.body?.privateProfile);
+  const shareAnonData = nb(req.body?.shareAnonData);
+  const privacyAgreed = nb(req.body?.privacyAgreed);
+  const privacyAgreedAt = req.body?.privacyAgreedAt ? String(req.body.privacyAgreedAt) : undefined;
+
+  const ringtoneName = (req.body?.ringtoneName ?? '').trim() || undefined;
+
+  // settings payload (except undefined)
+  const payload = {};
+  if (alarm_volume !== undefined) payload.alarm_volume = alarm_volume;
+  if (playlist_url !== undefined) payload.playlist_url = playlist_url;
+  if (notificationEnabled !== undefined) payload.notificationEnabled = notificationEnabled;
+  if (privateProfile !== undefined) payload.privateProfile = privateProfile;
+  if (shareAnonData !== undefined) payload.shareAnonData = shareAnonData;
+  if (privacyAgreed !== undefined) payload.privacyAgreed = privacyAgreed;
+  if (privacyAgreedAt) payload.privacyAgreedAt = privacyAgreedAt;
+
+
+  try {
+    // 1) merge settings (not exist -> INSERT)
+    if (Object.keys(payload).length) {
+      await pool.query(`
+        INSERT INTO userprofile (userid, settings, updated_at)
+        VALUES ($1, $2::jsonb, now())
+        ON CONFLICT (userid) DO UPDATE SET
+          settings  = COALESCE(userprofile.settings, '{}'::jsonb) || $2::jsonb,
+          updated_at = now()
+      `, [userId, JSON.stringify(payload)]);
+    }
+
+    // 2) ringtone_name update
+    if (ringtoneName !== undefined) {
+      await pool.query(`
+        INSERT INTO userprofile (userid, ringtone_name, updated_at)
+        VALUES ($1, $2, now())
+        ON CONFLICT (userid) DO UPDATE SET
+          ringtone_name = EXCLUDED.ringtone_name,
+          updated_at = now()
+      `, [userId, ringtoneName]);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET: Header profile (Jihye Kim)
+router.get('/user/header', async (req, res) => {
+  if (!req.session?.user) {
+    return res.status(401).json({ error: 'Not logged in' });
+  }
+
+  const userId = req.session.user.id;
+
+  try {
+    const { rows } = await pool.query(
+      `
+      SELECT
+        u.userid,
+        u.name,
+        u.created_at AS user_created_at,
+        up.display_name,
+        up.avatar_url
+      FROM "User" u
+      LEFT JOIN userprofile up
+        ON up.userid = u.userid
+      WHERE u.userid = $1
+      `,
+      [userId]
+    );
+    
+    const r = rows[0];
+    
+    if (!r) {
+      // If no user
+      return res.json({
+        userid: userId,
+        username: null,
+        displayName: null,
+        avatarUrl: null,
+        created_at: null,
+      });
+    }
+
+    res.json({
+      userid:      r.userid,
+      username:    r.username,
+      displayName: r.display_name,
+      avatarUrl:   r.avatar_url,
+      created_at:  r.user_created_at,
+    });
+  } catch (err) {
+    console.error('GET /api/user/header error', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 export default router;
