@@ -19,7 +19,6 @@
       href="https://cdn.jsdelivr.net/npm/overlaysscrollbars@2.10.1/styles/overlayscrollbars.min.css"
     />
     <link rel="stylesheet" href="./dist/css/adminlte.css" />
-    <link rel="stylesheet" href="./dist/css/theme.css">
     <link
       rel="icon"
       type="image/png"
@@ -27,6 +26,73 @@
     />
 
     <style>
+      :root {
+        /* Light purple theme */
+        --violet: #8b5cf6;
+        --violet-600: #7c3aed;
+        --violet-400: #a78bfa;
+        --violet-300: #c4b5fd;
+        --violet-100: #ede9fe;
+
+        --ink: #0f172a;
+        --muted: #6b7280;
+        --glass: rgba(255, 255, 255, 0.6);
+        --ring-bg: #ffffff;
+      }
+
+      /* Gradient canvas + ambient blobs */
+      .app-main {
+        background: radial-gradient(
+            1200px 600px at 10% -10%,
+            rgba(139, 92, 246, 0.15),
+            transparent 60%
+          ),
+          radial-gradient(
+            800px 500px at 110% 20%,
+            rgba(196, 181, 253, 0.22),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+        min-height: 100vh;
+      }
+      .ambient {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 9999px;
+        filter: blur(40px);
+        opacity: 0.4;
+        animation: float 18s ease-in-out infinite;
+      }
+      .blob.violet {
+        width: 360px;
+        height: 360px;
+        background: #c4b5fd;
+        left: 10%;
+        top: 20%;
+      }
+      .blob.sky {
+        width: 420px;
+        height: 420px;
+        background: #ede9fe;
+        right: 8%;
+        bottom: 10%;
+        animation-delay: -6s;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) translateX(0);
+        }
+        50% {
+          transform: translateY(-20px) translateX(10px);
+        }
+      }
+
       /* Center stage */
       .center-wrap {
         position: relative;
@@ -488,14 +554,18 @@
 
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
     <div class="app-wrapper">
-     <!-- Header Jihye Kim-->
-        <nav id="nav-placeholder" class="app-header navbar navbar-expand bg-body">
-            <!-- JS file -->
-        </nav>
-        <!-- SideBar -->
-        <aside id="sidebar-placeholder" class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-            <!-- JS file -->
-        </aside>
+      <!-- Navigation and sidebar placeholders -->
+      <nav id="nav-placeholder" class="app-header navbar navbar-expand bg-body">
+        <!-- Empty -->
+      </nav>
+
+      <aside
+        id="sidebar-placeholder"
+        class="app-sidebar bg-body-secondary shadow"
+        data-bs-theme="dark"
+      >
+        <!-- Empty -->
+      </aside>
 
       <!-- Main -->
       <main class="app-main">
@@ -649,10 +719,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <script src="../../dist/js/adminlte.js"></script>
-
-    <!-- header & sidebar script: Jihye Kim-->
-    <script defer src="./dist/js/headerCommon.js"></script>
-    <script defer src="./dist/js/layoutLoader.js"></script>
 
     <script>
       // Sidebar scrollbars
@@ -829,6 +895,13 @@
           await saveNap({ startedAt, endedAt, durationSec });
           remainingSec = durationSec;
           render();
+
+          // Open a popup window with another file
+          const popup = window.open(
+            `sleepsurvey.html?napID=${encodeURIComponent(currNapID)}`,
+            "Sleep-Survey",
+            "width=600,height=400,resizable=yes,scrollbars=yes"
+          );
         }
 
         function tick() {
@@ -906,6 +979,8 @@
         render();
       })();
     </script>
+    <script defer src="/dist/js/headerCommon.js"></script>
+    <script defer src="/dist/js/layoutLoader.js"></script>
 
     <!-- Sleep Music mini player logic -->
     <script>
@@ -998,6 +1073,10 @@
         // Initial load
         refreshFromStorage();
       })();
+    </script>
+
+    <script>
+      let awaitingSaveConfirmation = false;
 
       // Chatbot functionality
       const chatbotToggle = document.getElementById("chatbot-toggle");
@@ -1089,9 +1168,128 @@
           chatbotInput.focus();
         }, 1500);
       }
+
+      async function fetchRecommendations() {
+        try {
+          const res = await fetch("api/recommendations");
+          const data = await res.json();
+
+          removeTypingIndicator();
+
+          if (!Array.isArray(data) || data.length === 0) {
+            addMessage(
+              "I couldn't find any recommended nap times based on your availability.",
+              false
+            );
+            return;
+          }
+
+          let text = "Here are your personalized recommended nap times:\n\n";
+
+          for (const rec of data) {
+            text += `• ${rec.day}: ${rec.time}\n`;
+          }
+
+          addMessage(text, false);
+          addMessage(
+            "Would you like me to save these nap times for you?",
+            false
+          );
+
+          console.log("RECOMMENDATIONS:");
+          console.log(data);
+
+          awaitingSaveConfirmation = true;
+          window.lastRecommendations = data; // save it temporarily
+        } catch (err) {
+          console.error(err);
+          removeTypingIndicator();
+          addMessage(
+            "Sorry! I had trouble fetching your nap recommendations.",
+            false
+          );
+        }
+      }
+
+      async function saveNapTimes() {
+        showTypingIndicator();
+
+        try {
+          const dayMap = {
+            Sunday: 0,
+            Monday: 1,
+            Tuesday: 2,
+            Wednesday: 3,
+            Thursday: 4,
+            Friday: 5,
+            Saturday: 6,
+          };
+
+          const parseTime = (t) => {
+            let [hour, minPart] = t.split(":");
+            const min = parseInt(minPart);
+            let isPM = t.toLowerCase().includes("pm");
+
+            hour = parseInt(hour);
+
+            if (isPM && hour !== 12) hour += 12;
+            if (!isPM && hour === 12) hour = 0;
+
+            return `${hour.toString().padStart(2, "0")}:${min
+              .toString()
+              .padStart(2, "0")}:00`;
+          };
+
+          // Convert recommendations into backend format
+          const naps = window.lastRecommendations.map((r) => {
+            const [startStr, endStr] = r.time.split("–").map((s) => s.trim());
+
+            return {
+              day: dayMap[r.day],
+              startTime: parseTime(startStr),
+              endTime: parseTime(endStr),
+            };
+          });
+
+          console.log("Parsed naps:", naps);
+
+          const res = await fetch("/api/napSchedule", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ naps }),
+          });
+
+          const data = await res.json();
+
+          removeTypingIndicator();
+
+          if (data.success) {
+            addMessage(
+              "Your nap schedule has been saved successfully! 😄",
+              false
+            );
+          } else {
+            addMessage("Something went wrong saving your nap times.", false);
+          }
+        } catch (err) {
+          console.error("Save error:", err);
+          removeTypingIndicator();
+          addMessage("Sorry, I had trouble saving your nap schedule.", false);
+        }
+      }
       // Smart response generator
       function generateResponse(userMessage) {
         const message = userMessage.toLowerCase();
+
+        if (
+          message.includes("recommend") ||
+          message.includes("suggest") ||
+          message.includes("nap schedule") ||
+          message.includes("when should i nap") ||
+          message.includes("best time to nap")
+        ) {
+          return "__FETCH_RECOMMENDATIONS__";
+        }
 
         // Nap duration questions
         if (
@@ -1214,9 +1412,50 @@
         setTimeout(() => {
           removeTypingIndicator();
 
+          // Check if we are awaiting user confirmation to save
+          if (awaitingSaveConfirmation) {
+            const lower = message.toLowerCase();
+
+            if (
+              lower.includes("yes") ||
+              lower.includes("save") ||
+              lower.includes("sure")
+            ) {
+              awaitingSaveConfirmation = false;
+              saveNapTimes(); // <-- we'll define this next
+              return;
+            }
+
+            if (
+              lower.includes("no") ||
+              lower.includes("not") ||
+              lower.includes("don't")
+            ) {
+              awaitingSaveConfirmation = false;
+              addMessage(
+                "Okay! I won't save them. Let me know if you change your mind!",
+                false
+              );
+              return;
+            }
+
+            // If they typed something else, ask again politely
+            addMessage(
+              "Sorry, I didn't catch that — would you like me to save your nap times?",
+              false
+            );
+            return;
+          }
+
           // Generate response
           const response = generateResponse(message);
-          addMessage(response, false);
+
+          // If chatbot needs to fetch recommendation from backend
+          if (response === "__FETCH_RECOMMENDATIONS__") {
+            fetchRecommendations();
+          } else {
+            addMessage(response, false);
+          }
 
           chatbotSend.disabled = false;
           chatbotInput.focus();
