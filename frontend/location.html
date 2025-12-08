@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Napster | Location Recommendations</title>
-    <link rel="stylesheet" href="./dist/css/theme.css">
 
     <style>
       /* ---------- Design tokens / base styles ---------- */
@@ -130,14 +129,6 @@
     </style>
   </head>
   <body>
-    <!-- Header Jihye Kim-->
-    <nav id="nav-placeholder" class="app-header navbar navbar-expand bg-body">
-      <!-- JS file -->
-  </nav>
-  <!-- SideBar -->
-  <aside id="sidebar-placeholder" class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
-      <!-- JS file -->
-  </aside>
     <header>
       <!-- Brand: hide image if it fails to load (keeps layout clean) -->
       <img
@@ -189,15 +180,13 @@
     <!-- Cards are rendered here -->
     <div id="results"></div>
 
-    <!-- <a class="back" href="./nappingPage.html">↩ Back to Home</a> -->
+    <a class="back" href="./nappingPage.html">↩ Back to Home</a>
 
     <p class="footer-note">
       Data is loaded from <code>./data/places.json</code>. You can edit or
       replace it later.
     </p>
 
-    <script defer src="./dist/js/headerCommon.js"></script>
-    <script defer src="./dist/js/layoutLoader.js"></script>
     <!-- Load all logic from the external file -->
     <script src="./js/recommendations.js" defer></script>
   </body>
